@@ -12,7 +12,7 @@ public class TreeGenerator : MonoBehaviour {
 	void Update () {
         if (Input.GetMouseButtonDown(2))
         {
-            GameObject Tree = Instantiate(TreePrefab) as GameObject;
+            //GameObject Tree = Instantiate(TreePrefab) as GameObject;
         }
 	}
 }

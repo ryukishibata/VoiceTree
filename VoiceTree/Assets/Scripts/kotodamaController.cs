@@ -7,15 +7,18 @@ public class kotodamaController : MonoBehaviour {
      */
     public void setKotodamaParam(
         string character,
+        float charaSize,
         Vector3 position,
-        Quaternion rotation,
-        Vector3 localscale
+        Quaternion rotation
         )
     {
-        this.GetComponent<TextMesh>().text = character;
         this.transform.position = position;
         this.transform.rotation = rotation;
-        this.transform.localScale = localscale;
+        this.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+
+        this.GetComponent<TextMesh>().text = character;
+        this.GetComponent<TextMesh>().fontSize = 64;
+        this.GetComponent<TextMesh>().characterSize = charaSize;
     }
 
     /*--------------------------------------------------------- jumpKotodama */
@@ -23,14 +26,18 @@ public class kotodamaController : MonoBehaviour {
      */
     public void jumpKotodama(
         float force,//飛ばす力
+        float charaSize,
         Vector3 position,
-        Quaternion rotation,
-        Vector3 localscale
+        Quaternion rotation
         )
     {
         this.transform.position = position;
         this.transform.rotation = rotation;
-        this.transform.localScale = localscale;
+        this.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+
+        this.GetComponent<TextMesh>().fontSize = 64;
+        this.GetComponent<TextMesh>().characterSize = charaSize;
+
         //this.GetComponent<Rigidbody>().isKinematic = true;
         this.GetComponent<Rigidbody>().AddForce(transform.forward * force);
     }

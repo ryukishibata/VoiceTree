@@ -8,7 +8,7 @@ public class kotodamaGenerator : MonoBehaviour {
     GameObject AudioData;
 
     /*---------------------------------------------------------------- 音声系 */
-    int volume;           //音量
+    float volume;           //音量
 
     /*---------------------------------------------------------------- 文字系 */
     string sentence;      //文章データ
@@ -21,8 +21,8 @@ public class kotodamaGenerator : MonoBehaviour {
 
     /*---------------------------------------------------------------- 言霊系 */
     string character;     //一文字データ
+    float charaSize;   //大きさ
     float force;     //飛ばすときのエネルギー量
-    Vector3 localScale;   //大きさ
 
 
     /*---------------------------------------------------------------- 時間系 */
@@ -49,13 +49,9 @@ public class kotodamaGenerator : MonoBehaviour {
 
         //言霊系
         this.character = this.sentence[this.s_pointa].ToString();
-        this.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-        this.force = this.volume;
-        this.localScale = new Vector3(
-            this.volume / 500.0f,
-            this.volume / 500.0f,
-            0.1f
-            );
+        this.force = this.volume * 100.0f;
+        this.charaSize = this.volume;
+
 
 
         //時間系
@@ -65,19 +61,23 @@ public class kotodamaGenerator : MonoBehaviour {
 	
 	/*-------------------------------------- Update is called once per frame */
 	void Update () {
-
         //デバイスのトリガがUPのとき
         if (this.megaphone.GetComponent<LoudspeakerController>().triggerState == 1)
         {
             this.s_pointa = 0;
             this.span = this.delta;//トリガをひいた瞬間出るようにする
-
+            
+            //最初のみ文字データを格納する
+            this.sentence = this.AudioData.GetComponent<GetAudioData>().sentence;
         }
         
 
         //デバイスのトリガがON
         if (this.megaphone.GetComponent<LoudspeakerController>().onTrigger)
         {
+            /*---------------------------------------------- 音声データの取得 */
+            //this.AudioData.GetComponent<GetAudioData>().getAudioData();
+
 
             /*---------------------------------------------- パラメータの更新 */
             //音量系
@@ -86,14 +86,12 @@ public class kotodamaGenerator : MonoBehaviour {
             if (this.sentence != this.preSentence) {
                 this.sentence = this.AudioData.GetComponent<GetAudioData>().sentence;
             }
+
             //言霊系
             this.character = this.sentence[this.s_pointa].ToString();
-            this.force = this.volume;
-            this.localScale = new Vector3(
-                this.volume / 500.0f,
-                this.volume / 500.0f,
-                0.1f
-                );
+            this.force = this.volume * 200.0f;
+            this.charaSize = this.volume;
+
             /*------------------------------------------------- その他の設定 */
             this.delta += Time.deltaTime;
 
@@ -107,16 +105,16 @@ public class kotodamaGenerator : MonoBehaviour {
                     //言霊パラメータの初期化
                     kotodama.GetComponent<kotodamaController>().setKotodamaParam(
                         this.character,
+                        this.charaSize,
                         megaphone.transform.position,
-                        megaphone.transform.rotation,
-                        this.localScale
+                        megaphone.transform.rotation
                         );
                     //メガホンから飛び出させる
                     kotodama.GetComponent<kotodamaController>().jumpKotodama(
                         this.force,
+                        this.charaSize,
                         megaphone.transform.position,
-                        megaphone.transform.rotation,
-                        this.localScale
+                        megaphone.transform.rotation
                         );
 
                     /*---------------------------------------- ポインタの更新 */
