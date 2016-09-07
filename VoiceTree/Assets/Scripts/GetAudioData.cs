@@ -12,7 +12,7 @@ public class GetAudioData : MonoBehaviour {
     //DummyAUdioData
     void DummyAudioData()
     {
-        this.volume = 700;
+        this.volume = 100;
         this.sentence = "樹の葉嚙む雌鹿のごとく背を伸ばしあなたの耳にことば吹きたり";
     }
     //AudioDataを取得する

@@ -8,12 +8,20 @@ public class LoudspeakerController : MonoBehaviour {
 
     public bool onTrigger;
     public int triggerState;//(0: DEFAULT, 1:DOWN, -1:UP)
-
+    float mouseX = 0;
+    float mouseY = 0;
 
 
     //マウスで操作する
     void mouseController()
     {
+        mouseX = (Input.mousePosition.x - (Camera.main.pixelWidth / 2.0f)) * 0.2f;
+        mouseY = (Input.mousePosition.y - (Camera.main.pixelHeight / 2.0f)) * 0.2f;
+
+        //Debug.Log();
+
+        this.transform.rotation = Quaternion.Euler( -mouseY, mouseX, 0.0f);
+
         //メガホンのスイッチON/OFF
         if (Input.GetMouseButtonDown(0)){
             this.onTrigger = true;
