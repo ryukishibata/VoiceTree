@@ -2,6 +2,10 @@
 using System.Collections;
 
 public class kotodamaController : MonoBehaviour {
+    public GameObject kotodamaParticlePrefab;
+    GameObject kotodamaGenerator;
+
+
     /*----------------------------------------------------- setKotodamaParam */
     /*◆パラメータセット
      */
@@ -43,16 +47,28 @@ public class kotodamaController : MonoBehaviour {
     }
 
     // Use this for initialization
-    void Start () {        
+    void Start () {
+        this.kotodamaGenerator = GameObject.Find("kotodamaGenerator");
     }
 
     // Update is called once per frame
     void Update () {
 
         //消滅条件
-        if(this.transform.position.y < -1)
+        if (this.transform.position.y <= 0)
         {
+            //Particle
+            GameObject kotodamaParticle = Instantiate(kotodamaParticlePrefab) as GameObject;
+            kotodamaParticle.GetComponent<kotodamaParticlePrefabController>().playParticle(
+                this.transform.position);
+
+            //SE
+            this.kotodamaGenerator.GetComponent<kotodamaGenerator>().playKotodamaSE(
+                this.transform.position);
+            
             Destroy(gameObject);
+
+
         }
 	}
 }

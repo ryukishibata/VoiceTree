@@ -64,12 +64,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\FontScalable.cs" />
+    <Compile Include="Assets\Scripts\GameDirector.cs" />
     <Compile Include="Assets\Scripts\GetAudioData.cs" />
     <Compile Include="Assets\Scripts\LoudspeakerController.cs" />
     <Compile Include="Assets\Scripts\TreeController.cs" />
     <Compile Include="Assets\Scripts\TreeGenerator.cs" />
     <Compile Include="Assets\Scripts\kotodamaController.cs" />
     <Compile Include="Assets\Scripts\kotodamaGenerator.cs" />
+    <Compile Include="Assets\Scripts\kotodamaParticlePrefabController.cs" />
     <Compile Include="Assets\SpeechRecognition\Speech.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
