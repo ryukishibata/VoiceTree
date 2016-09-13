@@ -4,16 +4,14 @@ using System.Collections;
 public class kotodamaController : MonoBehaviour {
 
     public GameObject kotodamaParticlePrefab;
+    public GameObject DNAPrefab;
     GameObject kotodamaGenerator;
     GameObject seedPrefab;
     //Transform
     Vector3 speedInSeed;
     //TextMesh
     float tm_charaSize;
-    const float tm_charSizeMin = 0.2f;
     //Other
-    bool inSeed;
-
 
     /*----------------------------------------------------- setKotodamaParam */
     /*◆パラメータセット
@@ -68,58 +66,49 @@ public class kotodamaController : MonoBehaviour {
         this.kotodamaGenerator = GameObject.Find("kotodamaGenerator");
         this.seedPrefab = GameObject.Find("SeedPrefab");
 
-        this.inSeed = false;
     }
     /*=======================================================================*/
     // Update is called once per frame
     void Update () {
-        //樹の種の影響範囲
-        float seedRange = 2.0f;
         //樹の種の半径
         float seedRad = this.seedPrefab.GetComponent<SphereCollider>().radius;
         //樹の種までの距離
         float dist = (this.seedPrefab.transform.position - this.transform.position).magnitude;
 
-        //樹の種に当たったかどうか
+        /*----------------------------------------- 樹の種に当たったかどうか */
         if(dist < seedRad)
         {
-            this.inSeed = true;
-            this.GetComponent<Rigidbody>().isKinematic = true;
-            this.speedInSeed = this.transform.forward * 0.01f;
+            //Seed設定
+            this.seedPrefab.GetComponent<SeedController>().onHitDNA();
+
+            //DNAの生成
+            GameObject DNA = Instantiate(DNAPrefab) as GameObject;
+
+            Vector3 moveTo = (this.seedPrefab.transform.position - this.transform.position).normalized * 0.1f;
+            DNA.GetComponent<DNAController>().setParam(
+                this.transform.position + moveTo,
+                this.GetComponent<TextMesh>().color
+                );
+
+            Destroy(gameObject);
         }
 
-
-        if (this.inSeed)//種の中にいる
+        /*--------------------------------------------------------- 消滅条件 */
+        if (this.transform.position.y <= 0)
         {
+            //Particle
+            GameObject kotodamaParticle = Instantiate(kotodamaParticlePrefab) as GameObject;
+            kotodamaParticle.GetComponent<kotodamaParticleController>().playParticle(
+                this.transform.position);
+
+            //SE
+            this.kotodamaGenerator.GetComponent<kotodamaGenerator>().playKotodamaSE(
+                this.transform.position);
+            
             //消滅
             Destroy(gameObject);
         }
-        else//種の外にいる
-        {
-            //if (dist > seedRad && dist < seedRange)
-            //{
-            //    float sizeOffset;
-            //    this.GetComponent<TextMesh>().color = new Color(1.0f, 1.0f, 1.0f);
-            //
-            //    sizeOffset = dist * (1.0f - tm_charSizeMin) / (seedRange - seedRad);
-            //    this.GetComponent<TextMesh>().characterSize = tm_charaSize * sizeOffset;
-            //}
-            /*------------------------------------------------------ 消滅条件 */
-            if (this.transform.position.y <= 0)
-            {
-                //Particle
-                GameObject kotodamaParticle = Instantiate(kotodamaParticlePrefab) as GameObject;
-                kotodamaParticle.GetComponent<kotodamaParticlePrefabController>().playParticle(
-                    this.transform.position);
-
-                //SE
-                this.kotodamaGenerator.GetComponent<kotodamaGenerator>().playKotodamaSE(
-                    this.transform.position);
-                
-                //消滅
-                Destroy(gameObject);
-            }
-        }//[else]:inSeed
+        
 
 	}//[update]
 }
