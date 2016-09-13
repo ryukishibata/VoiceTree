@@ -25,6 +25,7 @@ public class kotodamaGenerator : MonoBehaviour
 
     /*---------------------------------------------------------------- 言霊系 */
     string character;     //一文字データ
+    Color color;
     float charaSize;   //大きさ
     float force;     //飛ばすときのエネルギー量
 
@@ -63,6 +64,7 @@ public class kotodamaGenerator : MonoBehaviour
 
         //言霊系
         this.character = this.sentence[this.s_pointa].ToString();
+        this.color = new Color(Random.value, Random.value, Random.value, 1.0f);
         this.force = this.volume * 300.0f;
         this.charaSize = this.volume * 2.0f;
 
@@ -105,6 +107,7 @@ public class kotodamaGenerator : MonoBehaviour
 
                 //言霊系
                 this.character = this.sentence[this.s_pointa].ToString();
+                this.color = new Color(Random.value, Random.value, Random.value, 1.0f);
                 this.force = this.volume * 300.0f;
                 this.charaSize = this.volume * 2.0f;
 
@@ -121,6 +124,7 @@ public class kotodamaGenerator : MonoBehaviour
                         //言霊パラメータの初期化
                         kotodama.GetComponent<kotodamaController>().setKotodamaParam(
                             this.character,
+                            this.color,
                             this.charaSize,
                             megaphone.transform.position,
                             megaphone.transform.rotation
