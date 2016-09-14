@@ -12,7 +12,7 @@ public class SeedController : MonoBehaviour {
     //DNA
     public GameObject DNAPrefab;
     int DNACnt;
-    const int DNAMAX = 100;
+    const int DNAMAX = 10;
     Vector3 DNAPositon;
     Color DNAColor;
 
@@ -49,6 +49,8 @@ public class SeedController : MonoBehaviour {
     public void onHitKotodama(Vector3 pos, Color color)
     {
         if (this.DNACnt > DNAMAX){
+            //---------------------------------------- Seed
+            this.SeedState = 3;
             //Materialの変更
             if (this.DNACnt == DNAMAX + 1) {
                 this.SeedAlphaMax = 0.5f;
@@ -56,13 +58,14 @@ public class SeedController : MonoBehaviour {
                 this.DeltaSpd = 2.0f;
                 this.GetComponent<Renderer>().material = this.M_bloom;
             }
-            this.SeedState = 3;
+            //Audio
+            GetComponent<AudioSource>().Play();
         }
         else{
-            //Seed
+            //---------------------------------------- Seed
             this.SeedState = 1;
             this.seedAlpha = SeedAlphaMin;
-            //DNA
+            //----------------------------------------- DNA
             this.DNAPositon = pos;
             this.DNAColor = color;
             this.generateDNA();
