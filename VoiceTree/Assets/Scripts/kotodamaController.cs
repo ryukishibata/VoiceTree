@@ -4,7 +4,6 @@ using System.Collections;
 public class kotodamaController : MonoBehaviour {
 
     public GameObject kotodamaParticlePrefab;
-    public GameObject DNAPrefab;
     GameObject kotodamaGenerator;
     GameObject seedPrefab;
     //Transform
@@ -79,16 +78,19 @@ public class kotodamaController : MonoBehaviour {
         if(dist < seedRad)
         {
             //Seed設定
-            this.seedPrefab.GetComponent<SeedController>().onHitDNA();
-
-            //DNAの生成
-            GameObject DNA = Instantiate(DNAPrefab) as GameObject;
-
-            Vector3 moveTo = (this.seedPrefab.transform.position - this.transform.position).normalized * 0.1f;
-            DNA.GetComponent<DNAController>().setParam(
-                this.transform.position + moveTo,
+            this.seedPrefab.GetComponent<SeedController>().onHitKotodama(
+                this.transform.position,
                 this.GetComponent<TextMesh>().color
                 );
+
+            //DNAの生成
+            //GameObject DNA = Instantiate(DNAPrefab) as GameObject;
+            //
+            //Vector3 moveTo = (this.seedPrefab.transform.position - this.transform.position).normalized * 0.1f;
+            //DNA.GetComponent<DNAController>().setParam(
+            //    this.transform.position + moveTo,
+            //    this.GetComponent<TextMesh>().color
+            //    );
 
             Destroy(gameObject);
         }
