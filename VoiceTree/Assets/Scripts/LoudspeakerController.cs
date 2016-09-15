@@ -23,14 +23,14 @@ public class LoudspeakerController : MonoBehaviour {
         this.transform.rotation = Quaternion.Euler( -mouseY, mouseX, 0.0f);
 
         //メガホンのスイッチON/OFF
-        if (Input.GetMouseButtonDown(0)){
+        if (Input.GetMouseButtonDown(1)){
             this.onTrigger = true;
             this.triggerState = 1;
 
             //メガホンの演出
             //GetComponent<ParticleSystem>().Play();
         }
-        else if (Input.GetMouseButtonUp(0)){
+        else if (Input.GetMouseButtonUp(1)){
             this.onTrigger = false;
             this.triggerState = -1;
 

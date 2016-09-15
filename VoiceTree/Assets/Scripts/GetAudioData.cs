@@ -45,7 +45,7 @@ public class GetAudioData : MonoBehaviour {
     //ダミーの音関連データ
     void DummyAudioData()
     {
-        this.sentence = "樹の葉嚙む雌鹿のごとく背を伸ばしあなたの耳にことば吹きたり";
+        this.sentence = "あああああ";
     }
     /*--------------------------------------------------------- getAudioData */
     //AudioDataを取得する

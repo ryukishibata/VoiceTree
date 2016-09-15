@@ -69,30 +69,24 @@ public class kotodamaController : MonoBehaviour {
     /*=======================================================================*/
     // Update is called once per frame
     void Update () {
-        //樹の種の半径
-        float seedRad = this.seedPrefab.GetComponent<SphereCollider>().radius;
-        //樹の種までの距離
-        float dist = (this.seedPrefab.transform.position - this.transform.position).magnitude;
-
-        /*----------------------------------------- 樹の種に当たったかどうか */
-        if(dist < seedRad)
+        /*------------------------------------------- Seedが存在している場合 */
+        if (this.seedPrefab != null)
         {
-            //Seed設定
-            this.seedPrefab.GetComponent<SeedController>().onHitKotodama(
-                this.transform.position,
-                this.GetComponent<TextMesh>().color
-                );
+            //樹の種の半径
+            float seedRad = this.seedPrefab.GetComponent<SphereCollider>().radius;
+            //樹の種までの距離
+            float dist = (this.seedPrefab.transform.position - this.transform.position).magnitude;
 
-            //DNAの生成
-            //GameObject DNA = Instantiate(DNAPrefab) as GameObject;
-            //
-            //Vector3 moveTo = (this.seedPrefab.transform.position - this.transform.position).normalized * 0.1f;
-            //DNA.GetComponent<DNAController>().setParam(
-            //    this.transform.position + moveTo,
-            //    this.GetComponent<TextMesh>().color
-            //    );
-
-            Destroy(gameObject);
+            //樹の種に当たったかどうか
+            if (dist < seedRad)
+            {
+                //Seed設定
+                this.seedPrefab.GetComponent<SeedController>().onHitSeed(
+                    this.transform.position,
+                    this.GetComponent<TextMesh>().color
+                    );
+                Destroy(gameObject);
+            }
         }
 
         /*--------------------------------------------------------- 消滅条件 */
@@ -109,8 +103,7 @@ public class kotodamaController : MonoBehaviour {
             
             //消滅
             Destroy(gameObject);
-        }
-        
+        }        
 
 	}//[update]
 }

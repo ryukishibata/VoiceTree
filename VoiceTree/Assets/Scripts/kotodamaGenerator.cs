@@ -40,7 +40,7 @@ public class kotodamaGenerator : MonoBehaviour
     public void playKotodamaSE(Vector3 pos)
     {
         kotodamaSESourse.transform.position = pos;
-        kotodamaSESourse.PlayOneShot(kotodamaSE, 1.0f);
+        kotodamaSESourse.PlayOneShot(kotodamaSE, 0.3f);
     }
 
     /*------------------------------------------ Use this for initialization */
@@ -121,19 +121,21 @@ public class kotodamaGenerator : MonoBehaviour
                     {
                         GameObject kotodama = Instantiate(kotodamaPrefab) as GameObject;
 
+                        Vector3 kotodamaPos = megaphone.transform.position + (megaphone.transform.forward * 0.2f);
+
                         //言霊パラメータの初期化
                         kotodama.GetComponent<kotodamaController>().setKotodamaParam(
                             this.character,
                             this.color,
                             this.charaSize,
-                            megaphone.transform.position,
+                            kotodamaPos,
                             megaphone.transform.rotation
                             );
                         //メガホンから飛び出させる
                         kotodama.GetComponent<kotodamaController>().jumpKotodama(
                             this.force,
                             this.charaSize,
-                            megaphone.transform.position,
+                            kotodamaPos,
                             megaphone.transform.rotation
                             );
 

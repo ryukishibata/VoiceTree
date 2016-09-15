@@ -8,15 +8,19 @@ public class SeedController : MonoBehaviour {
      * 1:言霊の衝突+余韻エフェクト
      * 2:DNAが満タンの状態(デフォルト)
      * 3:DNAが満タンの状態(言霊の衝突+余韻エフェクト)
+     * 4:
+     * 5:
+     * 6:
      *-----------------------------------------------------------------------*/
     //DNA
     public GameObject DNAPrefab;
     int DNACnt;
-    const int DNAMAX = 10;
+    const int DNAMAX = 100;
     Vector3 DNAPositon;
     Color DNAColor;
 
     //Seed
+    public AudioClip SeedSE;
     public Material M_default;
     public Material M_bloom;
     int SeedState;
@@ -25,8 +29,12 @@ public class SeedController : MonoBehaviour {
     float SeedAlphaMin = 0.1f;
     float DeltaSpd = 2.0f; //Seedのalpha値が一秒間でどれだけ変化するか
 
+    //Tree
+    GameObject TreeGenerator;
+
     //Other
     GameObject MainCam;
+    float deltaTime;
 
     /*---------------------------------------------------------- generateDNA */
     /* DNAの生成
@@ -43,25 +51,52 @@ public class SeedController : MonoBehaviour {
             this.DNAColor
                     );
     }
+
+    /*---------------------------------------------------------- onHitGround */
+    /* 衝突判定(地面)
+     */
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "ground") {
+            //Seed
+            for (int i = 0; i < this.transform.childCount; ++i)
+            {
+                GameObject.Destroy(this.transform.GetChild(i).gameObject);
+            }
+            //樹木の生成
+            this.TreeGenerator.GetComponent<TreeGenerator>().GenerateTree(this.transform.position);
+
+            Destroy(this.gameObject);
+        }
+
+    }
+
     /*-------------------------------------------------------- onHitKotodama */
     /* 衝突判定(言霊)
      */
-    public void onHitKotodama(Vector3 pos, Color color)
+    public void onHitSeed(Vector3 pos, Color color)
     {
-        if (this.DNACnt > DNAMAX){
+        if (this.DNACnt >= DNAMAX){
             //---------------------------------------- Seed
             this.SeedState = 3;
-            //Materialの変更
-            if (this.DNACnt == DNAMAX + 1) {
+
+
+            //DNAが100ちょうどのとき
+            if (this.DNACnt == DNAMAX) {
+                //Audio
+                GetComponent<AudioSource>().PlayOneShot(SeedSE, 0.7f);
+                //Material
                 this.SeedAlphaMax = 0.5f;
                 this.SeedAlphaMin = 0.01f;
                 this.DeltaSpd = 2.0f;
                 this.GetComponent<Renderer>().material = this.M_bloom;
+                this.DNACnt++;
+                //Rigidbody
+                this.GetComponent<Rigidbody>().isKinematic = false;
             }
-            //Audio
-            GetComponent<AudioSource>().Play();
         }
         else{
+            //DNAが100になるまでカウント
             //---------------------------------------- Seed
             this.SeedState = 1;
             this.seedAlpha = SeedAlphaMin;
@@ -84,9 +119,12 @@ public class SeedController : MonoBehaviour {
         this.SeedAlphaMax = 0.5f;
         this.SeedAlphaMin = 0.1f;
         this.DeltaSpd = 2.0f;
+        this.GetComponent<Rigidbody>().isKinematic = true;
         this.GetComponent<Renderer>().material = this.M_default;
         //DNA
         this.DNACnt = 0;
+        //Tree
+        this.TreeGenerator = GameObject.Find("TreeGenerator");
         //Other
         this.MainCam = GameObject.Find("MainCamera");
     }
@@ -96,6 +134,7 @@ public class SeedController : MonoBehaviour {
      */
     // Update is called once per frame
     void Update () {
+
         switch (this.SeedState)
         {
             case 0:
@@ -122,13 +161,17 @@ public class SeedController : MonoBehaviour {
                 if (this.seedAlpha >= SeedAlphaMax)
                 {
                     this.seedAlpha = SeedAlphaMax;
-                    this.SeedState = 0;
+                    this.SeedState = 2;
                 }
                 //Apply Color
                 this.GetComponent<Renderer>().material.SetColor(
                     "_Color",
                     new Color(1.0f, 1.0f, 1.0f, this.seedAlpha)
                     );
+                break;
+            case 4:
+                break;
+            case 5: 
                 break;
             default:
                 break;
