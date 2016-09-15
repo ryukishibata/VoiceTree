@@ -36,6 +36,34 @@ public class SeedController : MonoBehaviour {
     GameObject MainCam;
     float deltaTime;
 
+
+    /*---------------------------------------------------------- DestroySeed */
+    /* 種の消去
+     */
+    void DestroySeed()
+    {
+        this.deltaTime += Time.deltaTime;
+        if (this.deltaTime > 20.0f)
+        {
+            this.GetComponent<SphereCollider>().isTrigger = true;
+        }
+
+        //種に触れていなくて
+        if(this.transform.position.y < -1.0f)
+        {
+            //Seed
+            for (int i = 0; i < this.transform.childCount; ++i)
+            {
+                GameObject.Destroy(this.transform.GetChild(i).gameObject);
+            }
+            //樹木の生成
+            this.TreeGenerator.GetComponent<TreeGenerator>().GenerateTree(this.transform.position);
+        
+            Destroy(this.gameObject);
+        }
+    }
+
+
     /*---------------------------------------------------------- generateDNA */
     /* DNAの生成
      */
@@ -58,15 +86,7 @@ public class SeedController : MonoBehaviour {
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "ground") {
-            //Seed
-            for (int i = 0; i < this.transform.childCount; ++i)
-            {
-                GameObject.Destroy(this.transform.GetChild(i).gameObject);
-            }
-            //樹木の生成
-            this.TreeGenerator.GetComponent<TreeGenerator>().GenerateTree(this.transform.position);
-
-            Destroy(this.gameObject);
+            
         }
 
     }
@@ -93,6 +113,8 @@ public class SeedController : MonoBehaviour {
                 this.DNACnt++;
                 //Rigidbody
                 this.GetComponent<Rigidbody>().isKinematic = false;
+                //Other
+                this.deltaTime = 0;
             }
         }
         else{
@@ -121,6 +143,7 @@ public class SeedController : MonoBehaviour {
         this.DeltaSpd = 2.0f;
         this.GetComponent<Rigidbody>().isKinematic = true;
         this.GetComponent<Renderer>().material = this.M_default;
+        this.GetComponent<SphereCollider>().isTrigger = false;
         //DNA
         this.DNACnt = 0;
         //Tree
@@ -154,8 +177,12 @@ public class SeedController : MonoBehaviour {
                     );
                 break;
             case 2:
+                //消えるまでの種の挙動
+                DestroySeed();
                 break;
             case 3:
+                //消えるまでの種の挙動
+                DestroySeed();
                 //Calc Alpha
                 this.seedAlpha += DeltaSpd * Time.deltaTime;
                 if (this.seedAlpha >= SeedAlphaMax)

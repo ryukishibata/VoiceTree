@@ -8,6 +8,7 @@ public class GetAudioData : MonoBehaviour {
     public float volume;     //0.1:やや大きめの声ではきはきと喋った時の大きさ
     public string sentence;
 
+    public GameObject R_Controller;
     GameObject megaphone;
     AudioSource microphone;
 
@@ -64,7 +65,7 @@ public class GetAudioData : MonoBehaviour {
     // Use this for initialization
     void Start () {
         this.megaphone = GameObject.Find("Megaphone");
-        
+
         this.volume = 0;
         this.sentence = "  ";
 
@@ -76,7 +77,7 @@ public class GetAudioData : MonoBehaviour {
     void Update () {
 
         //デバイスのトリガがONだったら
-        if (this.megaphone.GetComponent<LoudspeakerController>().onTrigger)
+        if (this.R_Controller.GetComponent<R_ControllerExample>().R_onTrigger)
         {
             getAudioData();
         }

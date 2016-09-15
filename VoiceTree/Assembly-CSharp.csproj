@@ -45,12 +45,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\ControllerExample.cs" />
      <Compile Include="Assets\Scripts\DNAController.cs" />
      <Compile Include="Assets\Scripts\FontScalable.cs" />
      <Compile Include="Assets\Scripts\GameDirector.cs" />
      <Compile Include="Assets\Scripts\GetAudioData.cs" />
      <Compile Include="Assets\Scripts\LoudspeakerController.cs" />
+     <Compile Include="Assets\Scripts\PlayerController.cs" />
+     <Compile Include="Assets\Scripts\R_ControllerExample.cs" />
      <Compile Include="Assets\Scripts\SeedController.cs" />
      <Compile Include="Assets\Scripts\Test_reflectVec.cs" />
      <Compile Include="Assets\Scripts\TreeController.cs" />

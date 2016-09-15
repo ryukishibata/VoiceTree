@@ -6,6 +6,7 @@ public class kotodamaGenerator : MonoBehaviour
 
     public GameObject kotodamaPrefab;
     public AudioClip kotodamaSE;
+    public GameObject R_Controller;
 
     GameObject megaphone;
     GameObject AudioData;
@@ -79,7 +80,7 @@ public class kotodamaGenerator : MonoBehaviour
     void Update()
     {
         //デバイスのトリガがUPのとき
-        if (this.megaphone.GetComponent<LoudspeakerController>().triggerState == 1)
+        if (this.R_Controller.GetComponent<R_ControllerExample>().R_triggerState == 1)
         {
             this.s_pointa = 0;
             this.span = this.delta;//トリガをひいた瞬間出るようにする
@@ -89,7 +90,7 @@ public class kotodamaGenerator : MonoBehaviour
         }
 
         //デバイスのトリガがON
-        if (this.megaphone.GetComponent<LoudspeakerController>().onTrigger)
+        if (this.R_Controller.GetComponent<R_ControllerExample>().R_onTrigger)
         {
             /*---------------------------------------------- 音声データの取得 */
             //this.AudioData.GetComponent<GetAudioData>().getAudioData();
