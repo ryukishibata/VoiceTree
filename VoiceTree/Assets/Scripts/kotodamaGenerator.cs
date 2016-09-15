@@ -40,7 +40,7 @@ public class kotodamaGenerator : MonoBehaviour
     public void playKotodamaSE(Vector3 pos)
     {
         kotodamaSESourse.transform.position = pos;
-        kotodamaSESourse.PlayOneShot(kotodamaSE, 0.3f);
+        kotodamaSESourse.PlayOneShot(kotodamaSE, 0.6f);
     }
 
     /*------------------------------------------ Use this for initialization */

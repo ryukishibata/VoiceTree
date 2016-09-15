@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class GameDirector : MonoBehaviour {
-
+	public bool VRMode;
 
     // Use this for initialization
     void Start () {
