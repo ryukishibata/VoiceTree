@@ -15,7 +15,7 @@ public class SeedController : MonoBehaviour {
     //DNA
     public GameObject DNAPrefab;
     int DNACnt;
-    const int DNAMAX = 100;
+    const int DNAMAX = 10;
     Vector3 DNAPositon;
     Color DNAColor;
 
@@ -42,6 +42,8 @@ public class SeedController : MonoBehaviour {
      */
     void DestroySeed()
     {
+		this.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+
         this.deltaTime += Time.deltaTime;
         if (this.deltaTime > 20.0f)
         {

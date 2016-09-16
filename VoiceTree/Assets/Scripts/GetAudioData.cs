@@ -4,13 +4,15 @@ using System.Collections;
 [RequireComponent(typeof(AudioSource))]
 
 public class GetAudioData : MonoBehaviour {
-    bool onAudioMode = false;//AudioDataを取得する
-    public float volume;     //0.1:やや大きめの声ではきはきと喋った時の大きさ
-    public string sentence;
+	public GameObject R_Controller;
+	public GameObject megaphone;
 
-    public GameObject R_Controller;
-    GameObject megaphone;
-    AudioSource microphone;
+	AudioSource microphone;
+
+	public string sentence;
+	public float volume;     //0.1:やや大きめの声ではきはきと喋った時の大きさ
+	bool onAudioMode = false;//AudioDataを取得する
+    
 
     /*---------------------------------------------------- GetAveragedVolume */
     //マイクのボリューム
@@ -30,7 +32,7 @@ public class GetAudioData : MonoBehaviour {
     //マイク音源との接続
     void setMicrophoneData()
     {
-        microphone = GameObject.Find("Megaphone").GetComponent<AudioSource>();
+		microphone = this.megaphone.GetComponent<AudioSource>();
         // 引数：(デバイス名（null ならデフォルト）, ループ, 何秒取るか, サンプリング周波数)
         microphone.clip = Microphone.Start(null, true, 999, 44100);
         microphone.loop = true;// ループ再生にしておく
@@ -64,10 +66,12 @@ public class GetAudioData : MonoBehaviour {
     /*---------------------------------------------------------------- Start */
     // Use this for initialization
     void Start () {
-        this.megaphone = GameObject.Find("Megaphone");
+
+		//この方法ではうまくいかない......
+		//this.megaphone = GameObject.FindGameObjectWithTag("megaphone");
 
         this.volume = 0;
-        this.sentence = "  ";
+        this.sentence = "あいうえお";
 
         setMicrophoneData();
     }

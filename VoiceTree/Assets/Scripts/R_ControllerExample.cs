@@ -4,19 +4,11 @@ using System.Collections;
 [RequireComponent(typeof(SteamVR_TrackedObject))]
 public class R_ControllerExample : MonoBehaviour
 {
-    public GameObject prefab;
-    public Rigidbody attachPoint;
-    SteamVR_TrackedObject trackedObj;
-    FixedJoint joint;
-
-
-    GameObject Megaphone;
-	SteamVR_Controller.Device device;
+	GameObject Megaphone;
 
     public bool R_onTrigger;
     public int R_triggerState;//0:default, 1,浅く引く, 2:深く引く, -1:離す
-
-
+	public int R_gripState;
 
     /*=======================================================================*/
     // Use this for initialization
@@ -29,9 +21,9 @@ public class R_ControllerExample : MonoBehaviour
     void Update()
     {
         SteamVR_TrackedObject trackedObject = GetComponent<SteamVR_TrackedObject>();
-        device = SteamVR_Controller.Input((int) trackedObject.index);
+        var device = SteamVR_Controller.Input((int) trackedObject.index);
 
-        /*------------------------------------------------------ 右トリガー */
+        /*--------------------------------------------------------- Trigger */
 		if (device.GetTouchDown (SteamVR_Controller.ButtonMask.Trigger)) {
 			this.R_onTrigger = true;
 			this.R_triggerState = 1;
@@ -45,6 +37,14 @@ public class R_ControllerExample : MonoBehaviour
 		}
 		else {
             this.R_triggerState = 0;
+		}
+
+		/*--------------------------------------------------------- Trigger */
+		if (device.GetPressDown (SteamVR_Controller.ButtonMask.Grip)) {
+			this.R_gripState = 1;
+		}
+		else {
+			this.R_gripState = 0;
 		}
 
         //other
@@ -87,62 +87,6 @@ public class R_ControllerExample : MonoBehaviour
         }
         if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad)) {
             //Debug.Log("タッチパッドに触っている");
-        }
-    }
-
-    /*-----------------------------------------------------------------------*/
-    /* PickUp
-     */
-     public void pickUp(GameObject target, GameObject hand)
-    {
-        var go = target;
-        go.transform.position = attachPoint.transform.position;
-
-        joint = go.AddComponent<FixedJoint>();
-        joint.connectedBody = hand.GetComponent<Rigidbody>();
-    }
-
-    /*=======================================================================*/
-    // Update is called once per frame
-    void FixedUpdate()
-    {
-        //device = SteamVR_Controller.Input((int)trackedObj.index);
-
-        if (joint == null && device.GetTouchDown(SteamVR_Controller.ButtonMask.Trigger))
-        {
-            //var go = GameObject.Instantiate(prefab);
-            //go.transform.position = attachPoint.transform.position;
-            //
-            //joint = go.AddComponent<FixedJoint>();
-            //joint.connectedBody = attachPoint;
-            
-        }
-        else if (joint != null && device.GetTouchUp(SteamVR_Controller.ButtonMask.Trigger))
-        {
-            var go = joint.gameObject;
-            var rigidbody = go.GetComponent<Rigidbody>();
-            Object.DestroyImmediate(joint);
-            joint = null;
-            Object.Destroy(go, 15.0f);
-
-            // We should probably apply the offset between trackedObj.transform.position
-            // and device.transform.pos to insert into the physics sim at the correct
-            // location, however, we would then want to predict ahead the visual representation
-            // by the same amount we are predicting our render poses.
-
-            var origin = trackedObj.origin ? trackedObj.origin : trackedObj.transform.parent;
-            if (origin != null)
-            {
-                rigidbody.velocity = origin.TransformVector(device.velocity);
-                rigidbody.angularVelocity = origin.TransformVector(device.angularVelocity);
-            }
-            else
-            {
-                rigidbody.velocity = device.velocity;
-                rigidbody.angularVelocity = device.angularVelocity;
-            }
-
-            rigidbody.maxAngularVelocity = rigidbody.angularVelocity.magnitude;
         }
     }
 }

@@ -4,10 +4,10 @@ using System.Collections;
 public class kotodamaGenerator : MonoBehaviour
 {
 
+	public GameObject R_Controller;
     public GameObject kotodamaPrefab;
     public AudioClip kotodamaSE;
-    public GameObject R_Controller;
-
+    
     GameObject megaphone;
     GameObject AudioData;
 
@@ -47,7 +47,8 @@ public class kotodamaGenerator : MonoBehaviour
     /*------------------------------------------ Use this for initialization */
     void Start()
     {
-        this.megaphone = GameObject.Find("Megaphone");
+		this.megaphone = GameObject.FindGameObjectWithTag("megaphone");
+
         this.AudioData = GameObject.Find("GetAudioData");
         this.kotodamaSESourse = GetComponent<AudioSource>();
 
@@ -122,7 +123,7 @@ public class kotodamaGenerator : MonoBehaviour
                     {
                         GameObject kotodama = Instantiate(kotodamaPrefab) as GameObject;
 
-                        Vector3 kotodamaPos = megaphone.transform.position + (megaphone.transform.forward * 0.2f);
+						Vector3 kotodamaPos = this.R_Controller.transform.position + (this.R_Controller.transform.forward * 0.2f);
 
                         //言霊パラメータの初期化
                         kotodama.GetComponent<kotodamaController>().setKotodamaParam(
@@ -130,14 +131,14 @@ public class kotodamaGenerator : MonoBehaviour
                             this.color,
                             this.charaSize,
                             kotodamaPos,
-                            megaphone.transform.rotation
+							this.R_Controller.transform.rotation
                             );
                         //メガホンから飛び出させる
                         kotodama.GetComponent<kotodamaController>().jumpKotodama(
                             this.force,
                             this.charaSize,
                             kotodamaPos,
-                            megaphone.transform.rotation
+							this.R_Controller.transform.rotation
                             );
 
                         /*---------------------------------------- ポインタの更新 */

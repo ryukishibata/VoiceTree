@@ -1,14 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LoudspeakerController : MonoBehaviour {
+public class MegaphoneController : MonoBehaviour {
 
 	GameObject SeedPrefab; 
     
 	GameObject MainCamera;
 	GameObject GameDirector;
 	GameObject GetAudioData;
-	public GameObject R_Controller;
+	GameObject R_Controller;
 
     float mouseX = 0;
     float mouseY = 0;
@@ -17,28 +17,12 @@ public class LoudspeakerController : MonoBehaviour {
     /*------------------------------------------------------ mouseController */
     /* 衝突判定(メガホン)
 	 */
-     void OnTriggerStay(Collider other)
+     void OnTriggerEnter(Collider other)
     {
         /*------------------------------------------------------------- Seed */
         if(other.gameObject.tag == "seed")
         {
-			
-            switch(R_Controller.GetComponent<R_ControllerExample>().R_triggerState)
-            {
-                case 1:
-                    this.R_Controller.GetComponent<R_ControllerExample>().pickUp(
-                        other.gameObject, this.gameObject );
-                    break;
-                case 2:
-                    break;
-                case -1:
-                    break;
-                case 0:
-                    break;
-                default:
-                    break;
-            }
-            
+			this.R_Controller.GetComponent<R_Throw> ().prefab = other.gameObject;
         }
     }
 
@@ -47,14 +31,6 @@ public class LoudspeakerController : MonoBehaviour {
 	 */
     void steamVRController()
 	{
-		//Position
-		Vector3 offsetModelPos = new Vector3(0, 0, 0.001f);
-		this.transform.position = 
-			this.R_Controller.transform.position + offsetModelPos;
-        //Rotation
-        Vector3 offsetModelRot = new Vector3(0, 270.0f, 270.0f);
-		this.transform.rotation = this.R_Controller.transform.rotation;
-
 
 	}
 
@@ -96,8 +72,10 @@ public class LoudspeakerController : MonoBehaviour {
         this.MainCamera = GameObject.Find("MainCamera");
         this.GameDirector = GameObject.Find("GameDirector");
 		this.GetAudioData = GameObject.Find("GetAudioData");
+        this.GetAudioData = GameObject.Find("SeedPrefab");
 
-		this.GetAudioData = GameObject.Find("SeedPrefab");
+        this.R_Controller = this.transform.parent.gameObject;
+
 
         this.R_Controller.GetComponent<R_ControllerExample>().R_onTrigger = false;
         this.R_Controller.GetComponent<R_ControllerExample>().R_triggerState = 0;
@@ -107,10 +85,7 @@ public class LoudspeakerController : MonoBehaviour {
 	void Update () {
 		if (this.GameDirector.GetComponent<GameDirector>().VRMode){
 			steamVRController();
-
-			if (Input.GetMouseButtonDown (0)) {
-				Debug.Log ("hit");
-			}
         }
+
     }
 }
