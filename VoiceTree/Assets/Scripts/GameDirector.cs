@@ -6,6 +6,7 @@ public class GameDirector : MonoBehaviour {
 	public int GameState;
 
     GameObject MainCamera;
+    GameObject megaphone;
 
     // Use this for initialization
     void Start () {
@@ -13,9 +14,10 @@ public class GameDirector : MonoBehaviour {
         if (!this.VRMode)
         {
             this.MainCamera = GameObject.Find("Main Camera");
+            this.megaphone = GameObject.Find("Megaphone");
 
-
-            this.MainCamera.transform.position = new Vector3(0.0f, 1.6f, -5.0f);
+            this.MainCamera.transform.position = new Vector3(0.0f, 1.6f, -1.0f);
+            this.megaphone.transform.position = new Vector3(0.0f, 1.3f, 0.0f);
 
         }
         /*---------------------------------------------------------- VR Mode */

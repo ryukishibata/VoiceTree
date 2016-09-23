@@ -39,8 +39,10 @@ public class GetAudioData : MonoBehaviour {
 
         // マイクが Ready になるまで待機（一瞬）
         while (!(Microphone.GetPosition("") > 0)) { }
+
         // 再生開始（録った先から再生、スピーカーから出力するとハウリングします）
         microphone.Play();
+
     }
 
 
@@ -87,6 +89,4 @@ public class GetAudioData : MonoBehaviour {
         }
 
 	}
-
-    
 }
