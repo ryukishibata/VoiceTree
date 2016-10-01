@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEditor;
 
-public class CreateMesh : MonoBehaviour
+public class CreatePrismMesh : MonoBehaviour
 {
 
     public Vector3 Pivot;
@@ -14,7 +14,6 @@ public class CreateMesh : MonoBehaviour
     public bool onBottomPolygon;
 
     private Mesh mesh;
-
     /*------------------------------------------------------------- cnt_True */
     int cnt_True(bool a, bool b)
     {
@@ -68,15 +67,16 @@ public class CreateMesh : MonoBehaviour
         for (int i = 0; i < this.Divition; i++)
         {
             //--- UVの指定.
-
+        
             //上部正多角形の一辺を辺として持つ三角形
-            newTriangles[(6 * i) + 0] = i;
+            newTriangles[(6 * i) + 0] = (i + 0) % Divition;
             newTriangles[(6 * i) + 1] = (i + 1) % Divition;
-            newTriangles[(6 * i) + 2] = i + (Divition + 1);
+            newTriangles[(6 * i) + 2] = (i + 1) % Divition + (Divition + 1);
+        
             //下部正多角形の一辺を辺として持つ三角形
-            newTriangles[(6 * i) + 3] = ((i + 1) % Divition) + (Divition + 1);
-            newTriangles[(6 * i) + 4] = i + (Divition + 1);
-            newTriangles[(6 * i) + 5] = (i + 1) % Divition;
+            newTriangles[(6 * i) + 3] = (i + 1) % Divition + (Divition + 1);
+            newTriangles[(6 * i) + 4] = (i + 0) % Divition + (Divition + 1);
+            newTriangles[(6 * i) + 5] = (i + 0) % Divition;
         }
         cnt_triangles = Divition * 2;
         //--- 上円.
@@ -124,24 +124,26 @@ public class CreateMesh : MonoBehaviour
     void Start()
     {
         //初期化
-        Pivot = new Vector3(0, 0, 0);
-        Height = 1.0f;
-        TopRadius = 0.5f;
-        BottomRadius = 1.0f;
-        Divition = 6;
-        onTopPolygon = false;
-        onBottomPolygon = false;
+        //Pivot = new Vector3(0, 0, 0);
+        //Height = 1.0f;
+        //TopRadius = 0.5f;
+        //BottomRadius = 0.5f;
+        //Divition = 6;
+        //onTopPolygon = false;
+        //onBottomPolygon = false;
 
-        drawPrism();
+        //drawPrism();
 
-        AssetDatabase.CreateAsset(mesh, "Assets/" + mesh.name + ".asset");
-        AssetDatabase.SaveAssets();
+        //Assets内に保存する(必要？)
+        //AssetDatabase.CreateAsset(mesh, "Assets/PrismMesh.asset");
+        //AssetDatabase.SaveAssets();
+
     }
     /*=======================================================================*/
     // Update is called once per frame
     void Update()
     {
-        drawPrism();
+        //drawPrism();
     }
 }
 

@@ -9,10 +9,10 @@ public class GetAudioData : MonoBehaviour {
 
 	AudioSource microphone;
 
-	public string sentence;
-	public float volume;     //0.1:やや大きめの声ではきはきと喋った時の大きさ
 	bool onAudioMode = false;//AudioDataを取得する
-    
+	public string sentence;
+
+    public float volume;     //0.1:やや大きめの声ではきはきと喋った時の大きさ
 
     /*---------------------------------------------------- GetAveragedVolume */
     //マイクのボリューム
