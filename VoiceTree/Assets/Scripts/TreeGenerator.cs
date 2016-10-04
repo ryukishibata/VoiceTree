@@ -32,6 +32,11 @@ public class TreeGenerator : MonoBehaviour {
     {
 
         Tree.GetComponent<TreeController>().setParam(
+            6,
+            0.5f,//声の大きさベース
+            0.8f,//声の高さベース
+            0.2f,//声の高さベース
+            2//声の高さベース
             );
     }
     /*=======================================================================*/
