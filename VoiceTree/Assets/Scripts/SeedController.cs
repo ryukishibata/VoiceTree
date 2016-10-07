@@ -16,8 +16,15 @@ public class SeedController : MonoBehaviour {
     public GameObject DNAPrefab;
     int DNACnt;
     const int DNAMAX = 10;
+    //tmpData
+    float DNAVol;
+    float DNAHeight;
+    string DNACharacter;
     Vector3 DNAPositon;
     Color DNAColor;
+
+    //Sound
+    float aveVol;
 
     //Seed
     public AudioClip SeedSE;
@@ -37,6 +44,18 @@ public class SeedController : MonoBehaviour {
     float deltaTime;
 
 
+    /*----------------------------------------------------------- calcSounds */
+    /* 樹木の生成に必要な音声パラメータの計算
+     */
+    void calcSounds()
+    {
+        //子要素をすべて取得して音量を求める
+        for(int i = 0; i < DNAMAX; i++)
+        {
+            aveVol += 0.0f;
+        }
+        aveVol = 0.2f;
+    }
     /*---------------------------------------------------------- DestroySeed */
     /* 種の消去
      */
@@ -45,7 +64,7 @@ public class SeedController : MonoBehaviour {
 		this.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
 
         this.deltaTime += Time.deltaTime;
-        if (this.deltaTime > 20.0f)
+        if (this.deltaTime > 1.0f)
         {
             this.GetComponent<SphereCollider>().isTrigger = true;
         }
@@ -59,7 +78,10 @@ public class SeedController : MonoBehaviour {
                 GameObject.Destroy(this.transform.GetChild(i).gameObject);
             }
             //樹木の生成
-            this.TreeGenerator.GetComponent<TreeGenerator>().GenerateTree(this.transform.position);
+            this.TreeGenerator.GetComponent<TreeGenerator>().GenerateTree(
+                this.transform.position,
+                this.aveVol
+                );
         
             Destroy(this.gameObject);
         }
@@ -78,8 +100,11 @@ public class SeedController : MonoBehaviour {
         //Apply Param
         DNA.GetComponent<DNAController>().setParam(
             this.DNAPositon + moveTo,
-            this.DNAColor
-                    );
+            this.DNAColor,
+            this.DNAVol,
+            this.DNAHeight,
+            this.DNACharacter
+            );
     }
 
     /*---------------------------------------------------------- onHitGround */
@@ -90,13 +115,14 @@ public class SeedController : MonoBehaviour {
         if (other.gameObject.tag == "ground") {
             
         }
-
     }
 
     /*-------------------------------------------------------- onHitKotodama */
     /* 衝突判定(言霊)
      */
-    public void onHitSeed(Vector3 pos, Color color)
+    public void onHitSeed(
+        Vector3 pos, Color color,
+        float vol, float height, string character)
     {
         if (this.DNACnt >= DNAMAX){
             //---------------------------------------- Seed
@@ -117,6 +143,8 @@ public class SeedController : MonoBehaviour {
                 this.GetComponent<Rigidbody>().isKinematic = false;
                 //Other
                 this.deltaTime = 0;
+                //calc Sounds Plam
+                calcSounds();
             }
         }
         else{
@@ -127,6 +155,9 @@ public class SeedController : MonoBehaviour {
             //----------------------------------------- DNA
             this.DNAPositon = pos;
             this.DNAColor = color;
+            this.DNAVol = vol;
+            this.DNAHeight = height;
+            this.DNACharacter = character;
             this.generateDNA();
             this.DNACnt++;
         }

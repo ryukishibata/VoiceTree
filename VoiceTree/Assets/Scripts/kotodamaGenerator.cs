@@ -13,6 +13,7 @@ public class kotodamaGenerator : MonoBehaviour
 
     /*---------------------------------------------------------------- 音声系 */
     float volume;           //音量
+    float height;           //高さ
     const float NOIZE = 0.01f;
 
     /*---------------------------------------------------------------- 文字系 */
@@ -55,6 +56,7 @@ public class kotodamaGenerator : MonoBehaviour
         /*---  パラメータ設定 ---*/
         //音声系
         this.volume = this.AudioData.GetComponent<GetAudioData>().volume;
+        this.height = 0.5f;
 
         //文字系
         this.sentence = this.AudioData.GetComponent<GetAudioData>().sentence;
@@ -127,6 +129,8 @@ public class kotodamaGenerator : MonoBehaviour
 
                         //言霊パラメータの初期化
                         kotodama.GetComponent<kotodamaController>().setKotodamaParam(
+                            this.volume,
+                            this.height,
                             this.character,
                             this.color,
                             this.charaSize,

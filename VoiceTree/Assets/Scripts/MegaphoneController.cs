@@ -42,7 +42,7 @@ public class MegaphoneController : MonoBehaviour {
         //Position
         //this.transform.position = new Vector3(0.2f, 1.4f, 0.3f);
         this.transform.position = 
-            this.MainCamera.transform.position/* + this.MainCamera.transform.forward * 1.0f*/;
+            this.MainCamera.transform.position + this.MainCamera.transform.forward * 1.0f;
         //Rotate
         mouseX = (Input.mousePosition.x - (Camera.main.pixelWidth / 2.0f)) * 0.2f;
         mouseY = (Input.mousePosition.y - (Camera.main.pixelHeight / 2.0f)) * 0.2f;

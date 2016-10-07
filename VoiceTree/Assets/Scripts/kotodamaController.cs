@@ -11,11 +11,15 @@ public class kotodamaController : MonoBehaviour {
     //TextMesh
     float tm_charaSize;
     //Other
+    float volume;
+    float height;
+    string chara;
 
     /*----------------------------------------------------- setKotodamaParam */
     /*◆パラメータセット
      */
-    public void setKotodamaParam( string character, Color color, float charaSize,
+    public void setKotodamaParam( float _volume, float _height, string _character,
+        Color color, float charaSize,
         Vector3 position, Quaternion rotation )
     {
 
@@ -23,6 +27,10 @@ public class kotodamaController : MonoBehaviour {
         /*-------------------------------------------------- メンバ変数に格納 */
         //TextMesh
         tm_charaSize = charaSize;
+        //Other
+        volume = _volume;
+        height = _height;
+        chara = _character;
 
         /*------------------------------------------------------------- 適用 */
         //Transform
@@ -30,7 +38,7 @@ public class kotodamaController : MonoBehaviour {
         this.transform.rotation = rotation;
         this.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
         //TextMesh
-        this.GetComponent<TextMesh>().text = character;
+        this.GetComponent<TextMesh>().text = _character;
         this.GetComponent<TextMesh>().color = color;
         this.GetComponent<TextMesh>().fontSize = 64;
         this.GetComponent<TextMesh>().characterSize = tm_charaSize;
@@ -83,7 +91,10 @@ public class kotodamaController : MonoBehaviour {
                 //Seed設定
                 this.seedPrefab.GetComponent<SeedController>().onHitSeed(
                     this.transform.position,
-                    this.GetComponent<TextMesh>().color
+                    this.GetComponent<TextMesh>().color,
+                    this.volume,
+                    this.height,
+                    this.chara
                     );
                 Destroy(gameObject);
             }

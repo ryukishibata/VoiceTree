@@ -14,28 +14,31 @@ public class TreeGenerator : MonoBehaviour {
     /*--------------------------------------------- public void GenerateTree */
     /* 樹木の生成点
      */
-    public void GenerateTree(Vector3 pos)
+    public void GenerateTree(Vector3 pos, float aveVol)
     {
 
         GameObject Tree = Instantiate(TreePrefab) as GameObject;
         //Aplly
         Tree.name = "Tree" + NumOfTree;
-        Tree.transform.position = pos;
-        setTreeDNA(ref Tree);
+        Tree.transform.position = new Vector3(pos.x, 0.0f, pos.z); 
+
+        setTreeDNA(ref Tree, aveVol);
 
         NumOfTree++;//木の本数取得
     }
     /*----------------------------------------------------------- setTreeDNA */
     /*樹木に必要なパラメータを計算して渡す
      */
-    void setTreeDNA(ref GameObject Tree)
+    void setTreeDNA(ref GameObject Tree, float aveVol)
     {
+        float radius = aveVol;//樹木の半径
+
 
         Tree.GetComponent<TreeController>().setParam(
             6,
-            0.5f,//声の大きさベース
-            0.8f,//声の高さベース
-            0.2f,//声の高さベース
+            radius,//声の大きさベース
+            0.90f,//声の高さベース
+            0.05f,//声の高さベース
             2//声の高さベース
             );
     }
@@ -44,7 +47,7 @@ public class TreeGenerator : MonoBehaviour {
     void Start () {
         NumOfTree = 0;
 
-        GenerateTree(new Vector3(0, 0, 0));
+        //GenerateTree(new Vector3(0, 0, 0));
     }
     /*=======================================================================*/
     // Update is called once per frame
