@@ -31,7 +31,8 @@ public class MegaphoneController : MonoBehaviour {
 	 */
     void steamVRController()
 	{
-        this.transform.position = this.R_Controller.transform.position;
+		this.transform.position = this.R_Controller.transform.position;
+		this.transform.rotation = this.R_Controller.transform.rotation;
     }
 
 	/*------------------------------------------------------ mouseController */
