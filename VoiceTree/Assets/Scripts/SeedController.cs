@@ -15,7 +15,7 @@ public class SeedController : MonoBehaviour {
     //DNA
     public GameObject DNAPrefab;
     int DNACnt;
-    const int DNAMAX = 10;
+    const int DNAMAX = 100;
     //tmpData
     float DNAVol;
     float DNAHeight;
@@ -30,6 +30,7 @@ public class SeedController : MonoBehaviour {
     public AudioClip SeedSE;
     public Material M_default;
     public Material M_bloom;
+    public float lifeTime;
     int SeedState;
     float seedAlpha;
     float SeedAlphaMax = 0.75f;
@@ -49,12 +50,16 @@ public class SeedController : MonoBehaviour {
      */
     void calcSounds()
     {
+        int num = 0;
         //子要素をすべて取得して音量を求める
-        for(int i = 0; i < DNAMAX; i++)
+        foreach (Transform DNA in this.transform)
         {
-            aveVol += 0.0f;
+            aveVol += DNA.gameObject.GetComponent<DNAController>().vol;
+            num++;
         }
-        aveVol = 0.2f;
+        aveVol /= (float)num;
+
+        Debug.Log("Volume : " + aveVol);
     }
     /*---------------------------------------------------------- DestroySeed */
     /* 種の消去
@@ -64,7 +69,7 @@ public class SeedController : MonoBehaviour {
 		this.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
 
         this.deltaTime += Time.deltaTime;
-        if (this.deltaTime > 1.0f)
+        if (this.deltaTime > this.lifeTime)
         {
             this.GetComponent<SphereCollider>().isTrigger = true;
         }
@@ -181,6 +186,9 @@ public class SeedController : MonoBehaviour {
         this.DNACnt = 0;
         //Tree
         this.TreeGenerator = GameObject.Find("TreeGenerator");
+        //Sounds
+        aveVol = 0;
+
         //Other
         this.MainCam = GameObject.Find("MainCamera");
     }

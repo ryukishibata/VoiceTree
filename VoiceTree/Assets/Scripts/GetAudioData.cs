@@ -9,13 +9,89 @@ public class GetAudioData : MonoBehaviour {
 
 	AudioSource microphone;
 
-	bool onAudioMode = false;//AudioDataを取得する
-	public string sentence;
+	bool onAudioMode = true;//AudioDataを取得する
 
-    public float volume;     //0.1:やや大きめの声ではきはきと喋った時の大きさ
+    public string sentence;   //文字列
+    public float speakingTime;//時間
+    public float volume;      //0.1:やや大きめの声ではきはきと喋った時の大きさ
+    public float height;
+
+    /*---------------------------------------------------- GetAveragedHeight */
+    //高さ
+    float GetAveragedHeight(int qSamples, float threshold)
+    {
+
+        //int qSamples = 256; //配列のサイズ
+        //float threshold = 0.04f; //ピッチとして検出する最小の分布
+        //float pitchValue; //ピッチの周波数
+
+        //float[] spectrum = new float[qSamples]; //FFTされたデータ
+
+        //microphone.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
+
+        //float max = 0;
+
+        ///*------------------------------------------------------------------*/
+        //for (int i = 1; i < spectrum.Length - 1; i++)
+        //{
+        //    max += spectrum[i];
+        //}
+
+
+
+        ///*------------------------------------------------------------------*/
+        //float maxV = 0;
+        //int maxN = 0;
+        ////最大値（ピッチ）を見つける。ただし、閾値は超えている必要がある
+        //for (int i = 0; i < qSamples; i++)
+        //{
+        //    if (spectrum[i] > maxV && spectrum[i] > threshold)
+        //    {
+        //        maxV = spectrum[i];
+        //        maxN = i;
+        //    }
+        //}
+        //float freqN = maxN;
+        //if (maxN > 0 && maxN < qSamples - 1)
+        //{
+        //    //隣のスペクトルも考慮する
+        //    float dL = spectrum[maxN - 1] / spectrum[maxN];
+        //    float dR = spectrum[maxN + 1] / spectrum[maxN];
+        //    freqN += 0.5f * (dR * dR - dL * dL);
+        //}
+
+        //pitchValue = freqN * (AudioSettings.outputSampleRate / 2) / qSamples;
+        //return max;
+
+        float[] spectrum = new float[qSamples];
+        microphone.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
+        float maxV = 0;
+        int maxN = 0;
+        //最大値（ピッチ）を見つける。ただし、閾値は超えている必要がある
+        for (int i = 0; i < qSamples; i++)
+        {
+            if (spectrum[i] > maxV && spectrum[i] > threshold)
+            {
+                maxV = spectrum[i];
+                maxN = i;
+            }
+        }
+
+        float freqN = maxN;
+        if (maxN > 0 && maxN < qSamples - 1)
+        {
+            //隣のスペクトルも考慮する
+            float dL = spectrum[maxN - 1] / spectrum[maxN];
+            float dR = spectrum[maxN + 1] / spectrum[maxN];
+            freqN += 0.5f * (dR * dR - dL * dL);
+        }
+
+        float pitchValue = freqN * (AudioSettings.outputSampleRate / 2) / qSamples;
+        return pitchValue;
+    }
 
     /*---------------------------------------------------- GetAveragedVolume */
-    //マイクのボリューム
+    //ボリューム
     float GetAveragedVolume()
     {
         float[] waveData = new float[256];
@@ -58,6 +134,7 @@ public class GetAudioData : MonoBehaviour {
     {
         if (onAudioMode) {
             this.volume = GetAveragedVolume();
+            this.height = GetAveragedHeight(1024, 0.04f);
         }
         else {
             this.volume = GetAveragedVolume();//ボリュームの取得
@@ -73,6 +150,8 @@ public class GetAudioData : MonoBehaviour {
 		//this.megaphone = GameObject.FindGameObjectWithTag("megaphone");
 
         this.volume = 0;
+        this.speakingTime = 0;
+
         this.sentence = "あいうえお";
 
         setMicrophoneData();
@@ -82,11 +161,17 @@ public class GetAudioData : MonoBehaviour {
     // Update is called once per frame
     void Update () {
 
+        //一回だけ入る
+        if(this.R_Controller.GetComponent<R_ControllerExample>().R_triggerState == 1)
+        {
+            //Debug.Log("hit");
+            this.speakingTime = 0;
+        }
         //デバイスのトリガがONだったら
         if (this.R_Controller.GetComponent<R_ControllerExample>().R_onTrigger)
         {
+            this.speakingTime += Time.deltaTime;
             getAudioData();
         }
-
 	}
 }

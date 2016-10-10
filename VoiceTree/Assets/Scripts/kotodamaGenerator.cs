@@ -12,8 +12,9 @@ public class kotodamaGenerator : MonoBehaviour
     GameObject AudioData;
 
     /*---------------------------------------------------------------- 音声系 */
-    float volume;           //音量
-    float height;           //高さ
+    float volume;             //音量
+    float height;             //高さ
+
     const float NOIZE = 0.01f;
 
     /*---------------------------------------------------------------- 文字系 */
