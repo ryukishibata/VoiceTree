@@ -47,7 +47,7 @@ public class TreeGenerator : MonoBehaviour {
     void Start () {
         NumOfTree = 0;
 
-        //GenerateTree(new Vector3(0, 0, 0));
+        GenerateTree(new Vector3(0, 0, 0), 0.2f);
     }
     /*=======================================================================*/
     // Update is called once per frame

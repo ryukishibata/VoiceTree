@@ -6,10 +6,10 @@ public class CreatePrismMesh : MonoBehaviour
 {
 
     public Vector3 Pivot;
-    public float Height;
+    public int Divition;
     public float TopRadius;
     public float BottomRadius;
-    public int Divition;
+    public float Height;
     public bool onTopPolygon;
     public bool onBottomPolygon;
 
@@ -24,6 +24,15 @@ public class CreatePrismMesh : MonoBehaviour
     /*----------------------------------------------------------- drawBranch */
     public void drawPrism()
     {
+
+        //Pivot　= new Vector3(0.0f, 0.0f, 0.0f);
+        //Height = 1.0f;
+        //TopRadius = 0.2f;
+        //BottomRadius = 0.5f;
+        //Divition = 6;
+        //onTopPolygon = false;
+        //onBottomPolygon = false;
+
         //制御
         if (TopRadius < 0) TopRadius = 0;
         if (BottomRadius < 0) BottomRadius = 0;

@@ -15,6 +15,9 @@ public class TreeController : MonoBehaviour
     float delta;
     float deltaGrowthSpeed;
 
+    //Tree
+    float scaleSize;
+
     //樹木の生成に必要なパラメータ
     int divCircle;
     float radius;        //下円の半径
@@ -88,24 +91,20 @@ public class TreeController : MonoBehaviour
 
         lastBranch = this.gameObject;
 
-        //樹木に必要なパラメータの計算
+        scaleSize = 1.0f;
 
-
-        //プリズムの設定
-        //PrismPrefab.GetComponent<PrismController>().setPrism(
-        //    0.0f,
-        //    radius * radiusDecRate,
-        //    radius,
-        //    divCircle
-        //    );
-        ////枝の追加
-        //AddBranch("Trunk" + NumOfTrunk, lastBranch);
+        //樹木の計算
+        this.transform.localScale = new Vector3(scaleSize, 1.0f, scaleSize);
 
     }
     /*=======================================================================*/
     // Update is called once per frame
     void Update()
     {
+        scaleSize += 0.01f;
+        //樹木の計算
+        this.transform.localScale = new Vector3(scaleSize, 1.0f, scaleSize);
+
         delta += Time.deltaTime;
 
         if (treeGrowth)
@@ -113,12 +112,12 @@ public class TreeController : MonoBehaviour
             if(NumOfTrunk == 0)
             {
                 /*------------------------------------------------ set Prism */
-                PrismPrefab.GetComponent<PrismController>().setPrism(
-                    0.0f,
-                    radius * radiusDecRate,
-                    radius,
-                    divCircle
-                    );
+                //PrismPrefab.GetComponent<PrismController>().setPrism(
+                //    0.0f,
+                //    (radius * radiusDecRate),
+                //    radius,
+                //    divCircle
+                //    );
                 /*--------------------------------------- インスタンスの生成 */
                 GameObject Branch = Instantiate(PrismPrefab) as GameObject;
 
@@ -158,12 +157,12 @@ public class TreeController : MonoBehaviour
                         {
                             if (lastBranch.GetComponent<CreatePrismMesh>().TopRadius > radiusMinTrunk) {
                                 /*------------------------------------------------ set Prism */
-                                PrismPrefab.GetComponent<PrismController>().setPrism(
-                                    0.0f,
-                                    topRad[j] * radiusDecRate,
-                                    topRad[j],
-                                    divCircle
-                                    );
+                                //PrismPrefab.GetComponent<PrismController>().setPrism(
+                                //    0.0f,
+                                //    (topRad[j] * radiusDecRate) * scaleSize,
+                                //    topRad[j] * scaleSize,
+                                //    divCircle
+                                //    );
                                 /*------------------------------------------------ インスタンスの生成 */
                                 GameObject Branch = Instantiate(PrismPrefab) as GameObject;
 
