@@ -6,13 +6,13 @@ public class TreeController2 : MonoBehaviour {
     //プリズムPrefab
     public GameObject PrismPrefab;
     public int treeDivition;
+    public float treeEnegy;   //エネルギーの総量
     public float treeDecrease;//1m時のエネルギー消費率
     public float treeMinEnegy;//節をつくるのに必要な最低エネルギー量
     public float branchHeight;
 
     bool treeGrowth;//成長中パラメータ
     int treeState;
-    float treeEnegy;   //エネルギーの総量
 
     /*=======================================================================*/
     // Use this for initialization
@@ -32,17 +32,15 @@ public class TreeController2 : MonoBehaviour {
         /*------------------------------------------------ インスタンスの生成 */
         GameObject Branch = Instantiate(PrismPrefab) as GameObject;
         // set Prism
-        Branch.GetComponent<PrismController>().getPrismData( this.name, treeEnegy );
+        Branch.GetComponent<PrismController>().getPrismData( this.name );
         // 親子構造
         Branch.transform.parent = this.gameObject.transform;
-
-
 
     }
 	
     /*=======================================================================*/
 	// Update is called once per frame
 	void Update () {
-	
-	}
+        treeEnegy += 0.1f;
+    }
 }
