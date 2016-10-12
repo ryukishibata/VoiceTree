@@ -21,6 +21,7 @@ public class PrismController : MonoBehaviour {
     float Enegy;
 
     GameObject TreePrefab;
+    GameObject ParentBranch; 
     float PrismHeight;
     float PrismGrowthSpeed;
 
@@ -36,11 +37,11 @@ public class PrismController : MonoBehaviour {
     /*------------------------------------------------------------- setPrism */
     /* プリズムに必要な値を取得する
      */
-    public void getPrismData(string name)
+    public void getPrismData(string name, ref GameObject Parent)
     {
         //set Prism Param
         TreePrefab = GameObject.Find(name);
-
+        ParentBranch = Parent;
         
         //calcuration Parameter
         calcPrismParam();
@@ -55,14 +56,23 @@ public class PrismController : MonoBehaviour {
      void calcPrismParam()
     {
         if (onGrowth){
-            PrismHeight = deltaTime * 0.2f;//一秒につき1mの速度で成長する
+            PrismHeight = deltaTime * 0.3f;//一秒につき1mの速度で成長する
         }
         else{
             PrismHeight = TreePrefab.GetComponent<TreeController2>().branchHeight;
         }
 
-        Enegy = TreePrefab.GetComponent<TreeController2>().treeEnegy;
-        BranchEnegy = Enegy - (PrismHeight * TreePrefab.GetComponent<TreeController2>().treeDecrease);
+        if (ParentBranch == TreePrefab) {
+            Enegy = TreePrefab.GetComponent<TreeController2>().treeEnegy;
+        }
+        else{
+            Enegy = ParentBranch.GetComponent<PrismController>().BranchEnegy;
+        }
+
+        float mapping = PrismHeight / TreePrefab.GetComponent<TreeController2>().branchHeight;
+        float decrease = TreePrefab.GetComponent<TreeController2>().treeDecrease * mapping;
+
+        BranchEnegy = Enegy - decrease;
 
         m_divition = TreePrefab.GetComponent<TreeController2>().treeDivition;
         m_bottomRad = Enegy * 0.002f;
