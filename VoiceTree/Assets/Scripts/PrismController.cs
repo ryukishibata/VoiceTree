@@ -16,14 +16,16 @@ public class PrismController : MonoBehaviour {
 
     //
     public bool onGrowth;//成長中フラグ(UIEditor側で必ずチェックを入れておくこと)
-    public float BranchEnegy;
+    public float[] ChildrenDivRad;
+    //public float BranchEnegy;
 
-    float Enegy;
+    //float Enegy;
 
     GameObject TreePrefab;
-    GameObject ParentBranch; 
-    float PrismHeight;
-    float PrismGrowthSpeed;
+    GameObject ParentBranch;
+    //float PrismHeight;
+    //float PrismGrowthSpeed;
+    int NumOfSibling; //自分自身が親ノードにおける何番目の子供なのか
 
     //Mesh
     int m_divition;
@@ -34,19 +36,47 @@ public class PrismController : MonoBehaviour {
     //Other
     float deltaTime;
 
+    /*---------------------------------------------------- setChildrenDivRad */
+    /* 子ノードの半径の割合を設定する
+     */
+    void setChildrenDivRad()
+    {
+        //★アルゴリズムの改良をすべし
+
+        int num = Random.Range(1, TreePrefab.GetComponent<TreeController2>().branchDiv);
+        num = 2;
+
+        ChildrenDivRad = new float[num];
+    
+        for(int i = 0; i < num; i++)
+        {
+            if(i == 0)
+            {
+                ChildrenDivRad[0] = Random.Range(6, 9) / 10.0f;
+            }
+            else
+            {
+                ChildrenDivRad[i] = 1.0f - ChildrenDivRad[0];
+            }
+        }
+
+    }
+
     /*------------------------------------------------------------- setPrism */
     /* プリズムに必要な値を取得する
      */
-    public void getPrismData(string name, ref GameObject Parent)
+    public void getPrismData(string name, ref GameObject Parent, int sibling)
     {
         //set Prism Param
         TreePrefab = GameObject.Find(name);
         ParentBranch = Parent;
-        
+        NumOfSibling = sibling;
+
         //calcuration Parameter
         calcPrismParam();
         //draw Mesh
-        generatePrismMesh(m_divition, m_topRad, m_bottomRad, PrismHeight);
+        //generatePrismMesh(m_divition, m_topRad, m_bottomRad, PrismHeight);
+        generatePrismMesh(m_divition, m_topRad, m_bottomRad, m_height);
 
         return;
     }
@@ -55,28 +85,65 @@ public class PrismController : MonoBehaviour {
      */
      void calcPrismParam()
     {
-        if (onGrowth){
-            PrismHeight = deltaTime * 0.3f;//一秒につき1mの速度で成長する
-        }
-        else{
-            PrismHeight = TreePrefab.GetComponent<TreeController2>().branchHeight;
-        }
+        //if (onGrowth){
+        //    PrismHeight = deltaTime * 0.3f;//一秒につき1mの速度で成長する
+        //}
+        //else{
+        //    PrismHeight = TreePrefab.GetComponent<TreeController2>().branchHeight;
+        //}
+        //
+        //if (ParentBranch == TreePrefab) {
+        //    Enegy = TreePrefab.GetComponent<TreeController2>().treeEnegy;
+        //}
+        //else{
+        //    Enegy = ParentBranch.GetComponent<PrismController>().BranchEnegy;
+        //}
+        //
+        //float mapping = PrismHeight / TreePrefab.GetComponent<TreeController2>().branchHeight;
+        //float decrease = TreePrefab.GetComponent<TreeController2>().treeDecrease * mapping;
+        //
+        //BranchEnegy = Enegy - decrease;
+        //
+        //m_divition = TreePrefab.GetComponent<TreeController2>().treeDivition;
+        //m_bottomRad = Enegy * 0.002f;
+        //m_topRad = BranchEnegy * 0.002f;
 
-        if (ParentBranch == TreePrefab) {
-            Enegy = TreePrefab.GetComponent<TreeController2>().treeEnegy;
-        }
-        else{
-            Enegy = ParentBranch.GetComponent<PrismController>().BranchEnegy;
-        }
-
-        float mapping = PrismHeight / TreePrefab.GetComponent<TreeController2>().branchHeight;
-        float decrease = TreePrefab.GetComponent<TreeController2>().treeDecrease * mapping;
-
-        BranchEnegy = Enegy - decrease;
-
+        /*--------------------------------------------------------------------*/
         m_divition = TreePrefab.GetComponent<TreeController2>().treeDivition;
-        m_bottomRad = Enegy * 0.002f;
-        m_topRad = BranchEnegy * 0.002f;
+
+        /*----------------------------------------------------------- 下半径 */
+        if (ParentBranch == TreePrefab)
+        {
+            m_bottomRad += TreePrefab.GetComponent<TreeController2>().treeRadSpd;
+        }
+        else
+        {
+            m_bottomRad = 
+                  ParentBranch.GetComponent<CreatePrismMesh>().TopRadius;
+        }
+
+        /*------------------------------------------------------------- 高さ */
+        if (m_height > TreePrefab.GetComponent<TreeController2>().branchHeight){
+            //4.ノードが完全に成長しきったら
+            m_height = TreePrefab.GetComponent<TreeController2>().branchHeight;
+            onGrowth = false;
+        }
+        else{
+            m_height += TreePrefab.GetComponent<TreeController2>().treeGrowUp;
+        }
+
+        /*----------------------------------------------------------- 上半径 */
+        if (ParentBranch == TreePrefab)
+        {
+            m_topRad = m_bottomRad * TreePrefab.GetComponent<TreeController2>().treeDecrease;
+        }
+        else
+        {
+            m_topRad =
+                  ParentBranch.GetComponent<CreatePrismMesh>().TopRadius
+                * ParentBranch.GetComponent<PrismController>().ChildrenDivRad[NumOfSibling]
+                * TreePrefab.GetComponent<TreeController2>().treeDecrease;
+        }
 
         return;
     }
@@ -102,11 +169,18 @@ public class PrismController : MonoBehaviour {
     /*=======================================================================*/
 	// Use this for initialization
 	void Start () {
-        onGrowth = true;
-        PrismGrowthSpeed = 0;
-        PrismHeight = 0;
-
         deltaTime = 0;
+
+        onGrowth = true;
+        //PrismGrowthSpeed = 0;
+        //PrismHeight = 0;
+
+        //Mesh
+        m_topRad = 0;
+        m_bottomRad = 0;
+        m_height = 0;
+
+        setChildrenDivRad();
 
         return;
     }
@@ -119,17 +193,19 @@ public class PrismController : MonoBehaviour {
         //------------------------------------------- calcuration Parameter
         calcPrismParam();
         //------------------------------------------------------- draw Mesh
-        generatePrismMesh(m_divition, m_topRad, m_bottomRad, PrismHeight);
+        //generatePrismMesh(m_divition, m_topRad, m_bottomRad, PrismHeight);
+        generatePrismMesh(m_divition, m_topRad, m_bottomRad, m_height);
 
 
         //4.ノードが完全に成長しきったら
-        if (PrismHeight > TreePrefab.GetComponent<TreeController2>().branchHeight)
-        {
-            //------------------------------------------------------ update
-            GetComponent<CreatePrismMesh>().Height = 
-                TreePrefab.GetComponent<TreeController2>().branchHeight;
-
-            onGrowth = false;
-        }
+        //if (m_height > TreePrefab.GetComponent<TreeController2>().branchHeight)
+        //{
+        //    //------------------------------------------------------ update
+        //    GetComponent<CreatePrismMesh>().Height = 
+        //        TreePrefab.GetComponent<TreeController2>().branchHeight;
+        //
+        //    onGrowth = false;
+        //}
+        return;
     }
 }
