@@ -140,8 +140,8 @@ public class TreeController : MonoBehaviour
             //ノード分岐条件
             else
             {
-                if (!lastBranch.GetComponent<PrismController>().onGrowth)
-                {
+                //if (!lastBranch.GetComponent<PrismController>().onGrowth)
+                //{
                     int sibling = 0;
 
                     for (int i = 0; i < NumOfSibling; i++)
@@ -196,10 +196,10 @@ public class TreeController : MonoBehaviour
                     if(lastBranch.GetComponent<CreatePrismMesh>().TopRadius > radiusMinTrunk){
                         NumOfSibling = sibling;
                         NumOfHierarchy++;
-                    }
-                    else{
-                        treeGrowth = false;
-                    }
+                    //}
+                    //else{
+                    //    treeGrowth = false;
+                    //}
                     
                 }//[if] : Branchが分岐点に達したら
             }//[else] : 最初の一本目以外だったら

@@ -34,13 +34,13 @@ public class TreeGenerator : MonoBehaviour {
         float radius = aveVol;//樹木の半径
 
 
-        Tree.GetComponent<TreeController>().setParam(
-            6,
-            radius,//声の大きさベース
-            0.90f,//声の高さベース
-            0.05f,//声の高さベース
-            2//声の高さベース
-            );
+        //Tree.GetComponent<TreeController>().setParam(
+        //    6,
+        //    radius,//声の大きさベース
+        //    0.90f,//声の高さベース
+        //    0.05f,//声の高さベース
+        //    2//声の高さベース
+        //    );
     }
     /*=======================================================================*/
     // Use this for initialization
