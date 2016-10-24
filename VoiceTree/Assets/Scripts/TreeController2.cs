@@ -18,6 +18,7 @@ public class TreeController2 : MonoBehaviour
     public float DT_Egy_BreakPoint;      //１秒(DetlaTime)当たりの枝分岐エネルギーの備蓄率
     public float DM_Egy_Height;          //１m(DeltaMerter)成長するのに必要なエネルギー減少率
     public float Egy_BreakPointMax;      //節をつくるのに必要な最低エネルギー量
+    public float Egy_End;                //先端ノードの最小エネルギー量
     public float offsetRadRatio;         //エネルギー量に対する半径の比率
     
     /*-------------------------------------------------------------- private */
@@ -81,7 +82,7 @@ public class TreeController2 : MonoBehaviour
         float height_k = this.transform.FindChild("0-0").GetComponent<CreatePrismMesh>().BottomRadius;
         if(treeState == 0)
         {
-            DT_BranchGrowUp = 0.001f;
+            DT_BranchGrowUp = 1.0f;
         }
         else
         {
@@ -107,11 +108,12 @@ public class TreeController2 : MonoBehaviour
 
         //パラメータの設定
         DM_Egy_Height = 0.85f;//伸長ホルモンの消費パラメータ
-        Egy_BreakPointMax = 20.0f;//枝分岐に必要なホルモン量
+        Egy_BreakPointMax = 10.0f;//枝分岐に必要なホルモン量
         NPKEnergyMax.x = 100.0f;
         NPKEnergyMax.y = 0.0f;
         NPKEnergyMax.z = 0.0f;
         DT_NPKEnergy.x = 10.0f;
+        Egy_End = 5.0f;
         offsetRadRatio = 0.001f;
 
         treeState = 0;
@@ -142,7 +144,7 @@ public class TreeController2 : MonoBehaviour
                 break;
             case 1:
                 break;
-            case 3:
+            case 2:
                 break;
             default:
                 break;
