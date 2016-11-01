@@ -101,26 +101,30 @@ public class PrismController : MonoBehaviour {
     }
 
     /*=======================================================================*
-     * ◆Generate関数群
-     * 　・ノードの生成
-     * 　・本数, 角度の調整
+     * ◆set Transform 関数群
+     * 　ノードの位置, 姿勢を計算する
+     * 　
      * 　
      *=======================================================================*/
 
     /*----------------------------------------------- setMainBranchTransform */
     /* 幹と直結している枝の角度
      *-----------------------------------------------------------------------*/
-    void setMainBranchTransform(GameObject Branch, int BranchNumber)
+    void setTrunkBranchTransform(GameObject Branch, int NumOfBranches, int pitch, int randPitch)
     {
         Vector3 Direct = new Vector3(0, 0, 0);
         GameObject RefBranch;
-        int i = NumOfHierarchy;
 
-        if (BranchNumber > 1)
+        int randYaw = 10;
+
+        /*------------------------------------------------------ 枝の角度調節 */
+        if (NumOfBranches > 1)
         {
+            /*------------------------------------- ひとつ前の枝の位置を求める */
+            int i = Branch.GetComponent<PrismController>().NumOfHierarchy - 1;
             do
             {
-                if (FindDeep(TreePrefab, NumOfHierarchy + "-" + 1)
+                if (FindDeep(TreePrefab, i + "-" + 1)
                     .GetComponent<PrismController>().AttributeID == 1)
                 {
                     break;
@@ -130,39 +134,43 @@ public class PrismController : MonoBehaviour {
                     i--;
                 }
             } while (i > 0);
+
+            RefBranch = FindDeep(TreePrefab, i + "-" + 1).gameObject;
+
+            /*---------------------------------------------------- 角度の設定 */
+            switch (NumOfBranches % 4)
+            {
+                case 1:
+                    int num = Mathf.FloorToInt(NumOfBranches / 4.0f);
+
+                    Direct.x = Random.Range(pitch, pitch+randPitch);
+                    Direct.y = RefBranch.transform.eulerAngles.y + 180.0f * (1 / (num * 4.0f))
+                             + Random.Range(-randYaw / 2.0f, randYaw / 2.0f);
+                    break;
+                case 3:
+                    Direct.x = Random.Range(pitch, pitch + randPitch);
+                    Direct.y = RefBranch.transform.eulerAngles.y + 90.0f
+                             + Random.Range(-randYaw / 2.0f, randYaw / 2.0f);
+                    break;
+                default:
+                    Direct.x = Random.Range(pitch, pitch + randPitch);
+                    Direct.y = RefBranch.transform.eulerAngles.y + 180.0f
+                             + Random.Range(-randYaw / 2.0f, randYaw / 2.0f);
+                    break;
+            }
         }
-
-        RefBranch = FindDeep(TreePrefab, i + "-" + 1);
-        Debug.Log("Hit : " + RefBranch.name);
-
-        switch (BranchNumber % 4)
+        /*---------------------------------------------------- 最初の一回のみ */
+        else
         {
-            case 1:
-                int num = Mathf.FloorToInt(BranchNumber / 4.0f);
-
-                Direct.x = Random.Range(30, 60);
-                if (num == 0)
-                {
-                    Direct.y = Random.Range(0, 360);
-                }
-                else
-                {
-                    
-                    Direct.y = RefBranch.transform.localEulerAngles.y + 180.0f * (1 / (num * 4.0f));
-                }
-                break;
-            case 3:
-                Direct.x = Random.Range(30, 60);
-                Direct.y = RefBranch.transform.localEulerAngles.y + 90.0f;
-                break;
-            default://(case 0 && case 2)
-                Direct.x = Random.Range(30, 60);
-                Direct.y = RefBranch.transform.localEulerAngles.y + 180.0f;
-                break;
+            Direct.x = Random.Range(pitch, pitch + randPitch);
+            Direct.y = Random.Range(0, 360);
         }
 
+        /*---------------------------------------------------------- 適用部分 */
+        //set Position(Local)
         Branch.transform.localPosition = Vector3.up * this.GetComponent<CreatePrismMesh>().Height;
-        Branch.transform.localRotation = Quaternion.Euler(
+        //set Rotation(World)
+        Branch.transform.rotation = Quaternion.Euler(
             Direct.x,
             Direct.y,
             Direct.z
@@ -170,16 +178,58 @@ public class PrismController : MonoBehaviour {
 
         return;
     }
+    /*----------------------------------------------- setMainBranchTransform */
+    /* 幹と直結している枝の角度
+     *-----------------------------------------------------------------------*/
+    void setSubBranchTransform(GameObject Branch, int pitch, int randPitch)
+    {
+        Vector3 Direct = new Vector3(0, 0, 0);
+
+        /*-------------------------------------------------------- 角度の設定 */
+
+
+        /*---------------------------------------------------------- 適用部分 */
+        //set Position(Local)
+        Branch.transform.localPosition = Vector3.up * this.GetComponent<CreatePrismMesh>().Height;
+        //set Rotation(World)
+        //Branch.transform.localRotation = Quaternion.Euler(
+        //                    Random.Range(40, 80),
+        //                    0,
+        //                    0
+        //                    );
+
+        //Branch.transform.rotation = Quaternion.Euler(
+        //    Direct.x,
+        //    Direct.y,
+        //    Direct.z
+        //    );
+
+
+
+        //地面と水平に表示する
+        float randRoll = 90.0f;
+        if ((int)Random.Range(0, 2) == 0) randRoll *= -1;
+
+        Branch.transform.Rotate(
+            new Vector3(
+                Branch.transform.parent.transform.position.x,
+                0,
+                Branch.transform.parent.transform.position.z),
+            randRoll
+            );
+        //親枝の前方向と
+        return;
+    }
+
     /*--------------------------------------------------- setBranchTransform */
-    /* 枝の角度を決める
+    /* 枝全体の角度を決める
      *-----------------------------------------------------------------------*/
     void setBranchTransform(ref GameObject Branch, int SiblingOfHierarchy, int SiblingOfParent)
     {
         switch (SiblingOfHierarchy)
         {
-            /*------------------------------------------------------ 幹 */
+            /*=========================================================== 幹 */
             case 0:
-                Debug.Log("幹 : " + Branch.name);
                 Branch.GetComponent<PrismController>().AttributeID = 0;
                 Branch.transform.localPosition = Vector3.up * this.GetComponent<CreatePrismMesh>().Height;
                 Branch.transform.localRotation = Quaternion.Euler(
@@ -188,13 +238,12 @@ public class PrismController : MonoBehaviour {
                     0
                     );
                 break;
-            /*----------------------------------------------- その他の枝 */
+            /*======================================================= 幹以外 */
             default:
-                Branch.GetComponent<PrismController>().AttributeID = 2;
+                /*--------------------------------------------------- Main枝 */
                 if ((Branch.GetComponent<PrismController>().SiblingOfParent % 2) == 0)
                 {
-                    //Debug.Log("主枝 : " + Branch.name);
-                    /*------------------------------------------- main */
+                    Branch.GetComponent<PrismController>().AttributeID = 2;
                     Branch.transform.localPosition = Vector3.up * this.GetComponent<CreatePrismMesh>().Height;
                     Branch.transform.localRotation = Quaternion.Euler(
                         Random.Range(0, 10),
@@ -202,36 +251,40 @@ public class PrismController : MonoBehaviour {
                         0
                         );
                 }
+                /*---------------------------------------------------- Sub枝 */
                 else
                 {
+                    /*----------------------------------- 幹から生えている枝 */
                     if (Branch.transform.parent.GetComponent<PrismController>().SiblingOfHierarchy == 0)
                     {
-                        //Debug.Log("大枝 : " + Branch.name);
-                        //主となる枝の数
+                        //幹から生えている枝の数のカウント更新
+                        TreePrefab.GetComponent<TreeController2>().NumOfBranches++;
                         Branch.GetComponent<PrismController>().AttributeID = 1;
-                        TreePrefab.GetComponent<TreeController2>().NumOfNodes++;
-                        Branch.transform.localRotation = Quaternion.Euler(
-                                Random.Range(40, 80),
-                                Random.Range(0, 360),
-                                0
-                                );
+                        setTrunkBranchTransform(
+                            Branch, 
+                            TreePrefab.GetComponent<TreeController2>().NumOfBranches,
+                            30, 
+                            20
+                            );
                     }
+                    /*------------------------------------------ その他の枝 */
                     else
                     {
-                        Debug.Log("副枝 : " + Branch.name);
-                        /*------------------------------------------- sub */
-                        Branch.transform.localPosition = Vector3.up * this.GetComponent<CreatePrismMesh>().Height;
-                        Branch.transform.localRotation = Quaternion.Euler(
-                            Random.Range(40, 80),
-                            Random.Range(0, 360),
-                            0
-                            );
+                        Branch.GetComponent<PrismController>().AttributeID = 2;
+                        setSubBranchTransform(Branch, 40, 40);
                     }
                 }
                 break;
         }
         return;
     }
+
+    /*=======================================================================*
+     * ◆Generate関数群
+     * 　分岐してノード(枝)を生み出す処理を行う
+     * 　・ノードの生成
+     * 　・本数, 角度の調整
+     *=======================================================================*/
 
     /*-------------------------------------------------------- setRootBranch */
     /* 0-0ノードの作成
@@ -322,9 +375,9 @@ public class PrismController : MonoBehaviour {
         return;
     }
     /*=======================================================================*
-     * ◆Generate関数群
-     * 　・ノードの生成
-     * 　・本数, 角度の調整
+     * ◆calc(update)関数群
+     * 　・値の更新
+     * 　
      * 　
      *=======================================================================*/
 

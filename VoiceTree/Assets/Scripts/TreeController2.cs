@@ -98,7 +98,6 @@ public class TreeController2 : MonoBehaviour
         BranchRadEnd = 0.5f;         //枝先端の最小栄養ホルモン量
         BranchRadRatio = 0.002f;     //エネルギー量に対する半径比
         DivEnergyRatio = 0.4f;       //分岐時の副枝のエネルギー比率
-
         
         treeState = 0;
         NumOfBranches = 0;
