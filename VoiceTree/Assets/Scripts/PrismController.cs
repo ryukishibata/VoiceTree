@@ -15,30 +15,33 @@ using System.Collections;
 public class PrismController : MonoBehaviour {
 
     /*--------------------------------------------------------------- public */
-    public GameObject TreePrefab;   //どの樹木に属しているか
-    public GameObject ParentBranch;
-    public Vector3 NPKEnergy;       //エネルギー量
-    public int NumOfHierarchy;      //樹木における階層構造
-    public int SiblingOfHierarchy;  //階層構造に対して何番目の子供なのか
-    public int SiblingOfParent;     //親ノードに対して何番目の子供なのか
-    public int AttributeID;         //属性
-
-    /*-------------------------------------------------------------- private */
-    //Branch
-    /*****************************
+    /*******************************
+     * ◆ ノードの成長における状態遷移
      * 0:成長中
      * 1:分岐ノード
      * 2:先端ノード
      * 3:先端ノード成長停止
      * 4:全ノード成長停止
-     *****************************/
-    public int BranchState;
-    /*****************************
+     *******************************/
+    public int GrowUpState;//
+    /*******************************
+     * ◆ ノードの枝の属性
      * 0:幹
      * 1:主枝
      * 2:その他の枝
-     * 3:幹
-     *****************************/
+     *******************************/
+    public int PartsType;
+    public bool GrowingPoint;       //先端ノードか否か
+    public GameObject TreePrefab;   //どの樹木に属しているか
+    public GameObject ParentBranch; //親要素を格納する
+    public Vector3 NPKEnergy;       //エネルギー量
+    public Vector3 TmpNPKEnergy;    //花実エネルギーの貯蓄
+    public int NumOfHierarchy;      //樹木における階層構造
+    public int SiblingOfHierarchy;  //階層構造に対して何番目の子供なのか
+    public int SiblingOfParent;     //親ノードに対して何番目の子供なのか
+
+    /*-------------------------------------------------------------- private */
+    //Branch
     bool onGenerateBranch;        //枝分岐用フラグ
     float sproutHeight = 0.1f;    //発芽から分岐するまでの長さ
 
@@ -101,7 +104,7 @@ public class PrismController : MonoBehaviour {
             do
             {
                 if (FindDeep(TreePrefab, i + "-" + 1)
-                    .GetComponent<PrismController>().AttributeID == 1)
+                    .GetComponent<PrismController>().PartsType == 1)
                 {
                     break;
                 }
@@ -199,7 +202,7 @@ public class PrismController : MonoBehaviour {
         {
             /*=========================================================== 幹 */
             case 0:
-                Branch.GetComponent<PrismController>().AttributeID = 0;
+                Branch.GetComponent<PrismController>().PartsType = 0;
                 Branch.transform.localPosition = Vector3.up * this.GetComponent<CreatePrismMesh>().Height;
                 Branch.transform.localRotation = Quaternion.Euler(
                     Random.Range(
@@ -215,7 +218,7 @@ public class PrismController : MonoBehaviour {
                 /*--------------------------------------------------- Main枝 */
                 if ((Branch.GetComponent<PrismController>().SiblingOfParent % 2) == 0)
                 {
-                    Branch.GetComponent<PrismController>().AttributeID = 2;
+                    Branch.GetComponent<PrismController>().PartsType = 2;
                     Branch.transform.localPosition = Vector3.up * this.GetComponent<CreatePrismMesh>().Height;
                     Branch.transform.localRotation = Quaternion.Euler(
                         Random.Range(
@@ -234,7 +237,7 @@ public class PrismController : MonoBehaviour {
                     {
                         //幹から生えている枝の数のカウント更新
                         TreePrefab.GetComponent<TreeController2>().NumOfBranches++;
-                        Branch.GetComponent<PrismController>().AttributeID = 1;
+                        Branch.GetComponent<PrismController>().PartsType = 1;
                         setTrunkBranchTransform(
                             Branch, 
                             TreePrefab.GetComponent<TreeController2>().NumOfBranches,
@@ -245,7 +248,7 @@ public class PrismController : MonoBehaviour {
                     /*------------------------------------------ その他の枝 */
                     else
                     {
-                        Branch.GetComponent<PrismController>().AttributeID = 2;
+                        Branch.GetComponent<PrismController>().PartsType = 2;
                         setSubBranchTransform(
                             Branch, 
                             TreePrefab.GetComponent<TreeController2>().BranchSubPit[0],
@@ -288,6 +291,11 @@ public class PrismController : MonoBehaviour {
         //Transform
         this.transform.localPosition = TreePrefab.transform.up * 0;
 
+        //花実エネルギー
+        this.TmpNPKEnergy.x = 0;
+        this.TmpNPKEnergy.y = 0;
+        this.TmpNPKEnergy.z = 0;
+
         //calcuration Parameter
         calcPrismParam();
         //draw Mesh
@@ -303,8 +311,10 @@ public class PrismController : MonoBehaviour {
      *-----------------------------------------------------------------------*/
     void generateBranchPoints()
     {
-
-        /*------------------------------- 自分が何番目の子供なのかを検索する */
+        /*--------------------------------------- 先端ノードフラグをオフにする */
+        this.GrowingPoint = false;
+       
+        /*--------------------------------- 自分が何番目の子供なのかを検索する */
         int _SiblingOfHierarchy;                     //階層構造による兄弟番号
         int _SiblingOfParent;                        //同親における兄弟番号
         int nextHierarchy = this.NumOfHierarchy + 1; //階層構造における兄弟番号
@@ -329,11 +339,12 @@ public class PrismController : MonoBehaviour {
             {
                 NumOfNodes = 1;
             }
+            if(NumOfHierarchy < 1) NumOfNodes = 1;
         }
-        /*-------------------------------------------------- 何本枝分岐するか */
+        /*------------------------------------------------- 何本枝分岐するか */
         for (_SiblingOfParent = 0; _SiblingOfParent < NumOfNodes; _SiblingOfParent++)
         {
-            /*-------------------------------------------- インスタンスの生成 */
+            /*--------------------------------------- インスタンスの生成 */
             GameObject Branch = Instantiate(
                 TreePrefab.GetComponent<TreeController2>().PrismPrefab
                 ) as GameObject;
@@ -353,9 +364,22 @@ public class PrismController : MonoBehaviour {
             //親要素による兄弟番号
             Branch.GetComponent<PrismController>().SiblingOfParent = _SiblingOfParent;
 
-
             //Transform
             setBranchTransform(ref Branch, _SiblingOfHierarchy, _SiblingOfParent);
+
+            //葉っぱの生成
+            TreePrefab.GetComponent<LeafGenerator>().generateLeaf(Branch);
+            //葉っぱの親子構造変更
+            if (this.SiblingOfHierarchy == 0)
+            {
+                foreach (Transform child in this.transform)
+                {
+                    if (child.tag == "leaf")
+                    {
+                        child.GetComponent<LeafController>().setLeafParent(Branch.transform);
+                    }
+                }                    
+            }
 
             //カウンター更新
             _SiblingOfHierarchy++;
@@ -373,7 +397,7 @@ public class PrismController : MonoBehaviour {
      *=======================================================================*/
 
     /*------------------------------------------------------- checkAllState3 */
-    /* 全てのBranchStateが3になったかどうか
+    /* 全てのGrowUpStateが3になったかどうか
      *-----------------------------------------------------------------------*/
     bool checkAllState3()
     {
@@ -388,7 +412,7 @@ public class PrismController : MonoBehaviour {
                 tmp = FindDeep(TreePrefab, i + "-" + j);
                 if (tmp != null)
                 {
-                    if(tmp.GetComponent<PrismController>().BranchState != 3)
+                    if(tmp.GetComponent<PrismController>().GrowUpState != 3)
                     {
                         return false;
                     }
@@ -404,7 +428,7 @@ public class PrismController : MonoBehaviour {
         return true;
     }
     /*--------------------------------------------------------- setAllState4 */
-    /* 全てのBranchStateを４にする
+    /* 全てのGrowUpStateを４にする
      *-----------------------------------------------------------------------*/
     void setAllState(int state)
     {
@@ -419,7 +443,7 @@ public class PrismController : MonoBehaviour {
                 tmp = FindDeep(TreePrefab, i + "-" + j);
                 if (tmp != null)
                 {
-                    tmp.GetComponent<PrismController>().BranchState = state;
+                    tmp.GetComponent<PrismController>().GrowUpState = state;
                     j++;
                 }
             } while (tmp != null);
@@ -437,7 +461,7 @@ public class PrismController : MonoBehaviour {
     void updateStatus()
     {
         /*----------------------------------------------------- Statusの更新 */
-        switch (BranchState)
+        switch (GrowUpState)
         {
             case 0:
                 /*-------------------------------------------- UpdateStatus */
@@ -447,12 +471,12 @@ public class PrismController : MonoBehaviour {
                     //樹木が養分吸収中だったら
                     if (TreePrefab.GetComponent<TreeController2>().treeState == 0)
                     {
-                        BranchState = 1;//★枝分岐
+                        GrowUpState = 1;//★枝分岐
                         /*------------ 一定の高さまで成長しないと大きくならない */
                         if (ParentBranch == TreePrefab
                             && deltaTime < TreePrefab.GetComponent<TreeController2>().treeLifeTime[1])
                         {
-                            BranchState = 0;
+                            GrowUpState = 0;
                         }
                     }
                     //養分の吸収が終わっていたら
@@ -461,11 +485,11 @@ public class PrismController : MonoBehaviour {
                         if ((m_topRad * TreePrefab.GetComponent<TreeController2>().DivEnergyRatio)
                             > TreePrefab.GetComponent<TreeController2>().BranchRadEnd)
                         {
-                            BranchState = 1;//★枝分岐
+                            GrowUpState = 1;//★枝分岐
                         }
                         else
                         {
-                            BranchState = 2;//★枝分岐
+                            GrowUpState = 2;//★枝分岐
                         }
                     }
                 }
@@ -473,24 +497,24 @@ public class PrismController : MonoBehaviour {
                 {
                     if(deltaTime > TreePrefab.GetComponent<TreeController2>().treeLifeTime[0])
                     {
-                        BranchState = 3;
+                        GrowUpState = 3;
                     }
                 }
                 break;
             case 1:
-                BranchState = 2;
+                GrowUpState = 2;
                 break;
             case 2:
                 if (m_topRad < TreePrefab.GetComponent<TreeController2>().BranchRadEnd)
                 {
-                    BranchState = 3;
+                    GrowUpState = 3;
                 }
                 break;
             case 3:
                 if (checkAllState3() == true)
                 {
-
                     setAllState(4);
+                    TreePrefab.GetComponent<TreeController2>().treeState = 2;//★成長停止
                 }
                 break;
             case 4:
@@ -555,6 +579,52 @@ public class PrismController : MonoBehaviour {
         return;
     }
 
+    /*--------------------------------------------------- updateTmpNPKEnergy */
+    /* 花実ホルモンの更新(上分にも呼出部分あり)
+     *-----------------------------------------------------------------------*/
+    void updateTmpNPKEnergy()
+    {
+        GameObject tmp = ParentBranch;
+
+        /*-------------------------------------------------- 兄弟の数を求める */
+        int CntOfChildren = 0;
+        foreach (Transform child in tmp.transform)
+        {
+            CntOfChildren++;
+        }
+
+        if (CntOfChildren < 2)
+        {
+            this.TmpNPKEnergy.y = tmp.GetComponent<PrismController>().NPKEnergy.y
+                + tmp.GetComponent<PrismController>().TmpNPKEnergy.y;
+        }
+        else
+        {
+            /*------------------------- 親ノードがTmpNPKEnergy.yを持っていた場合 */
+            if (tmp.GetComponent<PrismController>().TmpNPKEnergy.y > 0)
+            {
+                switch (this.SiblingOfParent)
+                {
+                    case 0:
+                        this.TmpNPKEnergy.y =
+                            tmp.GetComponent<PrismController>().TmpNPKEnergy.y
+                            * (1.0f - TreePrefab.GetComponent<TreeController2>().DivEnergyRatio);
+                        break;
+                    case 1:
+                        this.TmpNPKEnergy.y =
+                            tmp.GetComponent<PrismController>().TmpNPKEnergy.y
+                            * TreePrefab.GetComponent<TreeController2>().DivEnergyRatio;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        
+
+        return;
+    }
+
     /*------------------------------------------------------ updateNPKEnergy */
     /* 成長ホルモンの更新
      *-----------------------------------------------------------------------*/
@@ -566,14 +636,22 @@ public class PrismController : MonoBehaviour {
             /*--------------------------------------------------- NPK Enegy */
             //[X] : 窒素
             NPKEnergy.x = ParentBranch.GetComponent<TreeController2>().NPKEnergy.x
-                * (1.0f - TreePrefab.GetComponent<TreeController2>().DivEnergyRatio);
+                        * (1.0f - TreePrefab.GetComponent<TreeController2>().DivEnergyRatio);
             //[Y] : リン酸
-            NPKEnergy.y = ParentBranch.GetComponent<TreeController2>().NPKEnergy.y;
+            NPKEnergy.y = ParentBranch.GetComponent<TreeController2>().NPKEnergy.x
+                        * TreePrefab.GetComponent<TreeController2>().DivEnergyRatio;
             //[Z] : カリウム
             NPKEnergy.z = ParentBranch.GetComponent<TreeController2>().NPKEnergy.z;
+
+            //伸長ホルモンの減算
+            NPKEnergy.x -= m_height * TreePrefab.GetComponent<TreeController2>().HgtEnergyRatio;
+            NPKEnergy.y += 0;
+            NPKEnergy.z += 0;
         }
         else
         {
+            updateTmpNPKEnergy();
+
             /*-------------------------------------------------- 主枝だったら */
             if (this.SiblingOfParent == 0)
             {
@@ -583,7 +661,9 @@ public class PrismController : MonoBehaviour {
                     ParentBranch.GetComponent<PrismController>().NPKEnergy.x
                     * (1.0f - TreePrefab.GetComponent<TreeController2>().DivEnergyRatio);
                 //[Y] : リン酸
-                NPKEnergy.y = ParentBranch.GetComponent<PrismController>().NPKEnergy.y;
+                NPKEnergy.y = 
+                    ParentBranch.GetComponent<PrismController>().NPKEnergy.x
+                    * TreePrefab.GetComponent<TreeController2>().DivEnergyRatio;
                 //[Z] : カリウム
                 NPKEnergy.z = ParentBranch.GetComponent<PrismController>().NPKEnergy.z;
             }
@@ -596,7 +676,9 @@ public class PrismController : MonoBehaviour {
                     ParentBranch.GetComponent<PrismController>().NPKEnergy.x
                     * TreePrefab.GetComponent<TreeController2>().DivEnergyRatio;
                 //[Y] : リン酸
-                NPKEnergy.y = ParentBranch.GetComponent<PrismController>().NPKEnergy.y;
+                NPKEnergy.y =
+                    ParentBranch.GetComponent<PrismController>().NPKEnergy.x
+                    * (1.0f - TreePrefab.GetComponent<TreeController2>().DivEnergyRatio);
                 //[Z] : カリウム
                 NPKEnergy.z = ParentBranch.GetComponent<PrismController>().NPKEnergy.z;
             }
@@ -604,8 +686,6 @@ public class PrismController : MonoBehaviour {
             NPKEnergy.x -= m_height * TreePrefab.GetComponent<TreeController2>().HgtEnergyRatio;
             NPKEnergy.y += 0;
             NPKEnergy.z += 0;
-
-            
 
         }
         return;
@@ -655,6 +735,7 @@ public class PrismController : MonoBehaviour {
      *-----------------------------------------------------------------------*/
     void calcPrismParam()
     {
+        
         updateNPKEnergy();
         updateTransform();
         updatePrismMesh();
@@ -692,7 +773,8 @@ public class PrismController : MonoBehaviour {
     {
         deltaTime = 0;
 
-        BranchState = 0;
+        GrowUpState = 0;
+        GrowingPoint = true;
         onGenerateBranch = false;
         NPKEnergy.x = 0;
         NPKEnergy.y = 0;
@@ -720,7 +802,7 @@ public class PrismController : MonoBehaviour {
         //------------------------------------------------------- draw Mesh
         generatePrismMesh(m_divition, m_topRad, m_bottomRad, m_height);
 
-        switch (BranchState)
+        switch (GrowUpState)
         {
             case 0:
                 break;

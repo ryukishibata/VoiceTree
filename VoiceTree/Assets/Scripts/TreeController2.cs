@@ -8,8 +8,8 @@ public class TreeController2 : MonoBehaviour
     public GameObject PrismPrefab;       //枝のMeshデータ
     /**********************************
      * 0:成長中
-     * 1:養分を吸い切った状態
-     * 2:
+     * 1:養分を吸い切った状態(treeLifeTime時間経過後)
+     * 2:樹木の成長停止
      * 3:
      **********************************/
     public int treeState;                //状態遷移
@@ -18,6 +18,11 @@ public class TreeController2 : MonoBehaviour
     public int NumOfBranches;            //主となる枝の本数
     public float treeHeight;             //高さ
     public float treeRadius;             //幅
+    /**********************************
+     * x: 窒素     :葉肥
+     * y: 燐酸     :花肥, 実肥
+     * z: カリウム :根声
+     **********************************/
     public Vector3 NPKEnergy;            //エネルギーの総量[x:窒素][y:燐酸][z:カリウム]
 
     public Vector3 NPKEnergyMax;         //エネルギー総量のMax値
@@ -39,8 +44,6 @@ public class TreeController2 : MonoBehaviour
  
     /*---------------------------------------------------------------- Other */
     float deltaTime;
-
-
 
 
     /*-------------------------------------------------------- updateNPKEnegy*/
@@ -127,7 +130,7 @@ public class TreeController2 : MonoBehaviour
         BreakEnergy[1] = 10.0f;
         BreakEnergy[2] = 3.0f;
         BreakEnergy[0] = BreakEnergy[1] + BreakEnergy[2];
-        BranchDivition = new int[] {2, 7 };
+        BranchDivition = new int[] {2, 10};
         BranchTrunkPit = new float[]{ 40.0f, 30.0f};
         BranchMainPit = new float[]{ 0.0f, 10.0f};
         BranchSubPit = new float[]{ 40.0f, 40.0f};
