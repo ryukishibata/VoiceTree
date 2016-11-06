@@ -26,8 +26,6 @@ public class LeafGenerator : MonoBehaviour {
         Leaf.transform.parent = ParentBranch.transform;
         //Transform
         Leaf.transform.position = ParentBranch.transform.position;
-        //樹木の名前
-        Leaf.GetComponent<LeafController>().treeName = this.name;
 
         this.NumOfLeaf++;
         return;
