@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 /*****************************************************************************
  * ◆葉っぱ全体の設定を行う
@@ -24,6 +25,7 @@ public class LeafGenerator : MonoBehaviour {
         Leaf.name = "Leaf" + this.NumOfLeaf;
         //親子構造
         Leaf.transform.parent = ParentBranch.transform;
+
         //Transform
         Leaf.transform.position = ParentBranch.transform.position;
 
