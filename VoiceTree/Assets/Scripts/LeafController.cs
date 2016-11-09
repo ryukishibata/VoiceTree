@@ -6,14 +6,19 @@ public class LeafController : MonoBehaviour {
     public Camera targetCamera;
     public GameObject treePrefab;
 
-    //scale
-    float scaleMax;
+    //Transform
+    float extent;      //カメラベクトルに対して葉をばらけさせる
+    float[] scale;     //[0:最低値][1:最大値]
     
     //Time
     float deltaTime;
     float seasonTime;
     float tmpTime;
     float dropTime;
+
+    //Other
+    float treeLine;   //樹木のエネルギー変化量を(0.0 - 1.0)までで正規化したもの
+
 
     /*=======================================================================*
      * ◆set 関数群
@@ -41,36 +46,41 @@ public class LeafController : MonoBehaviour {
         /*--------------------------------- 親ノード(枝)の成長における状態遷移 */
         if (this.transform.parent != null)
         {
-            if (this.transform.parent.GetComponent<PrismController>().SiblingOfParent != 0)
+            //ノードが生長していたら
+            if (this.transform.parent.GetComponent<PrismController>().GrowUpState < 4)
             {
-                //ノードが生長していたら
-                if (this.transform.parent.GetComponent<PrismController>().GrowUpState < 4)
-                {
-                    //translate
-                    this.transform.position = this.transform.parent.transform.position
-                          + this.transform.parent.transform.up
-                          * this.transform.parent.GetComponent<CreatePrismMesh>().Height;
 
-                    //billboard
-                    this.transform.LookAt(this.targetCamera.transform.position);
+                //translate
+                this.transform.position = this.transform.parent.transform.position
+                      + this.transform.parent.transform.up
+                      * this.transform.parent.GetComponent<CreatePrismMesh>().Height
+                      + this.targetCamera.transform.up
+                      * this.extent
+                      * this.treeLine;
+                //scale
+                var size = this.transform.lossyScale;
+                size.x = size.y = size.z =
+                      this.scale[0]
+                    + this.scale[1]
+                    * this.treeLine;
 
-                    //scale
-                    var size = this.transform.lossyScale;
-                    size.x = size.y = size.z =
-                        this.scaleMax * (this.treePrefab.GetComponent<TreeController2>().NPKEnergy.x
-                                         / this.treePrefab.GetComponent<TreeController2>().NPKEnergyMax.x);
-                    this.transform.localScale = size;
-                }
+
+                //billboard
+                this.transform.LookAt(this.targetCamera.transform.position);
+
+
+                this.transform.localScale = size;
             }
             //季節が冬になったら
-            if (GameObject.Find("GodPrefab").GetComponent<TimeController>().seasonState == 3)
+            if (GameObject.Find("GameDirector").GetComponent<TimeController>().seasonState == 3)
             {
                 this.tmpTime += Time.deltaTime;
                 if (this.tmpTime >= this.dropTime)
                 {
                     this.tmpTime = 0;
                     setLeafParent(null);
-                    this.gameObject.AddComponent<Rigidbody>();
+                    //this.gameObject.AddComponent<Rigidbody>();
+                    this.GetComponent<Rigidbody>().isKinematic = false;
                     this.GetComponent<Rigidbody>().useGravity = true;
                     this.GetComponent<Rigidbody>().drag = Random.Range(5.0f, 10.0f);
                     this.GetComponent<Rigidbody>().angularDrag = Random.Range(5.0f, 10.0f);
@@ -87,8 +97,7 @@ public class LeafController : MonoBehaviour {
             rot.z += Random.Range(-0.3f, 0.3f);
             this.transform.localRotation = rot;
             //AddForce
-            if (rot.x > 0.25f || rot.y > 0.25f || rot.z > 0.25f
-                || rot.x < -0.25f || rot.y < -0.25f || rot.z < -0.25f)
+            if (Mathf.Sqrt(rot.x * rot.x + rot.y * rot.y + rot.z * rot.z) > 1.3f)
             {
                 this.GetComponent<Rigidbody>().AddForce(
                     rot.x * 0.2f,
@@ -113,7 +122,7 @@ public class LeafController : MonoBehaviour {
     void Start () {
         //Time
         this.deltaTime = 0;
-        this.seasonTime = GameObject.Find("GodPrefab").GetComponent<TimeController>().seasonTime;
+        this.seasonTime = GameObject.Find("GameDirector").GetComponent<TimeController>().seasonTime;
         this.dropTime = Random.Range(0, seasonTime);
         this.tmpTime = 0;
 
@@ -123,10 +132,18 @@ public class LeafController : MonoBehaviour {
         this.treePrefab = this.transform.root.gameObject;
 
         //Transform
-        var size = this.transform.lossyScale;
-        size.x = size.y = size.z = this.scaleMax = Random.Range(0.5f, 0.5f);
-        this.transform.localScale = size;
+        this.extent = Random.Range(-0.1f, 0.1f);
+        //scale
+        this.scale = new float[2];
+        this.scale[0] = 0.5f;
+        this.scale[1] = 0;// Random.Range(0.3f, 0.5f);
+        this.transform.localScale = new Vector3(0, 0, 0);
 
+        //Other
+        this.treeLine = this.treePrefab.GetComponent<TreeController2>().NPKEnergy.x
+                         / this.treePrefab.GetComponent<TreeController2>().NPKEnergyMax.x;
+
+        return;
     }
     /*=======================================================================*/
     // Update is called once per frame
@@ -134,6 +151,8 @@ public class LeafController : MonoBehaviour {
     void Update ()
     {
         this.deltaTime += Time.deltaTime;
+        this.treeLine = this.treePrefab.GetComponent<TreeController2>().NPKEnergy.x
+                         / this.treePrefab.GetComponent<TreeController2>().NPKEnergyMax.x;
 
         //Transform
         updateTransform();

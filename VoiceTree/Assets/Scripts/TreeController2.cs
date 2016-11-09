@@ -37,7 +37,9 @@ public class TreeController2 : MonoBehaviour
     public float BranchRadEnd;           //先端ノードの最小半径
     public float BranchGrowUp;           //高さ方向の成長係数
     public int[] BranchDivition;         //分岐[0:本数][1:割合(x / 10.0f)]        
-   
+
+
+    float rotroll;
     
     /*-------------------------------------------------------------- private */
     const int BRANCHMAX = 50;            //一本当たりの最大ノード数
@@ -138,7 +140,7 @@ public class TreeController2 : MonoBehaviour
         NPKEnergyMax.x = 400.0f;     //吸い上げる窒素肥料の最大値
         NPKEnergyMax.y = 0.0f;       //吸い上げるリン酸の最大値
         NPKEnergyMax.z = 0.0f;       //吸い上げるカリウムの最大値
-        BranchRadEnd = 0.5f;         //枝先端の最小栄養ホルモン量
+        BranchRadEnd = 10.5f;         //枝先端の最小栄養ホルモン量
         BranchRadRatio = 0.0002f;    //エネルギー量に対する半径比
         DivEnergyRatio = 0.4f;       //分岐時の副枝のエネルギー比率
         HgtEnergyRatio = 0.35f;      //成長に伴って消費される伸長ホルモン比
@@ -147,6 +149,9 @@ public class TreeController2 : MonoBehaviour
         treeState = 0;
         NumOfBranches = 0;
         NumOfNodes = 0;
+
+        rotroll = 0;
+
 
         //最初のノードを描画する
         /*------------------------------------------- インスタンスの生成 */
@@ -175,5 +180,11 @@ public class TreeController2 : MonoBehaviour
             default:
                 break;
         }
+
+        rotroll += 1.0f;
+
+        this.transform.rotation = Quaternion.Euler(this.transform.up * rotroll);
+
+        GameObject[] tagobjs = GameObject.FindGameObjectsWithTag("leaf");
     }
 }

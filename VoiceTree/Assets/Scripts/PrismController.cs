@@ -23,7 +23,7 @@ public class PrismController : MonoBehaviour {
      * 3:先端ノード成長停止
      * 4:全ノード成長停止
      *******************************/
-    public int GrowUpState;//
+    public int GrowUpState;
     /*******************************
      * ◆ ノードの枝の属性
      * 0:幹
@@ -295,6 +295,9 @@ public class PrismController : MonoBehaviour {
         this.TmpNPKEnergy.x = 0;
         this.TmpNPKEnergy.y = 0;
         this.TmpNPKEnergy.z = 0;
+
+        //葉っぱの生成
+        TreePrefab.GetComponent<LeafGenerator>().generateLeaf(this.gameObject);
 
         //calcuration Parameter
         calcPrismParam();

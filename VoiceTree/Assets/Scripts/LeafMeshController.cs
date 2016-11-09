@@ -7,8 +7,8 @@ public class LeafMeshController : MonoBehaviour {
     public Camera targetCamera;
     public GameObject treePrefab;
 
-    //scale
-    float scaleMax;
+    //State
+    bool meshFlag;
 
     //Color
     float[] leafCol = new float[3];
@@ -76,7 +76,7 @@ public class LeafMeshController : MonoBehaviour {
      *-----------------------------------------------------------------------*/
     void updateTextColor()
     {
-        switch (GameObject.Find("GodPrefab").GetComponent<TimeController>().seasonState)
+        switch (GameObject.Find("GameDirector").GetComponent<TimeController>().seasonState)
         {
             case 0:
                 leafCol = colTable0;
@@ -116,12 +116,20 @@ public class LeafMeshController : MonoBehaviour {
                 {
                     if (colTable2[i] < colTable3[i])
                     {
-                        if (leafCol[i] > colTable3[i]) leafCol[i] = colTable3[i];
+                        if (leafCol[i] > colTable3[i])
+                        {
+                            leafCol[i] = colTable3[i];
+                            this.meshFlag = false;
+                        }
                         else leafCol[i] += (colTable3[i] - colTable2[i]) * Time.deltaTime;
                     }
                     else if (colTable2[i] > colTable3[i])
                     {
-                        if (leafCol[i] < colTable3[i]) leafCol[i] = colTable3[i];
+                        if (leafCol[i] < colTable3[i])
+                        {
+                            leafCol[i] = colTable3[i];
+                            this.meshFlag = false;
+                        }
                         else leafCol[i] -= (colTable2[i] - colTable3[i]) * Time.deltaTime;
                     }
                 }
@@ -155,6 +163,8 @@ public class LeafMeshController : MonoBehaviour {
         //Prefab
         this.treePrefab = this.transform.root.gameObject;
 
+        //State
+        this.meshFlag = true;
 
         //textMesh
         setTextText(Random.Range(0, 20));
@@ -170,7 +180,7 @@ public class LeafMeshController : MonoBehaviour {
         this.deltaTime += Time.deltaTime;
 
         //TextMesh
-        updateText();
+        if(this.meshFlag) updateText();
 
 
         /*------------------------------------------- 木の成長における状態遷移 */
